@@ -1,62 +1,89 @@
-import React from 'react';
-import type { FormProps } from 'antd';
-import { Button, Checkbox, Form, Input } from 'antd';
+import React, { useEffect } from 'react';
+import { Button, Form, type FormProps, Input, Flex, Card, Image } from 'antd';
+import { UserLoginScheme } from '../models/user';
+import { onLogin } from '../services/api/auth';
+import { useNavigate } from 'react-router-dom';
+import {useAuth } from '../hooks/useAuth';
 
-type FieldType = {
-  username?: string;
-  password?: string;
-  remember?: string;
+const t = (arg: string) => {
+  return arg
 };
 
-const onFinish: FormProps<FieldType>['onFinish'] = (values) => {
-  console.log('Success:', values);
+const Login: React.FC = () => {
+    const navigate = useNavigate()
+    const { setAuth } = useAuth();
+
+
+    const onFinish: FormProps<UserLoginScheme>["onFinish"] = (values) => {
+        try {
+            onLogin!({email: values.email, password: values.password}).then(result => {
+                const { access_token, refresh_token, role } = result.data;
+                setAuth({access_token, role});
+                localStorage.setItem('refresh_token', refresh_token);
+                navigate('/users')
+            });
+        } catch (error) {
+            console.log(error)
+        }
+    };
+
+    useEffect(() => {
+        if (localStorage.getItem('refresh_token')) {
+            navigate('/me');
+        }
+    }, []);
+
+    return (
+        <Flex style={{
+            width: '100vw',
+            height: '100vh',
+        }} justify="center" align="center">
+            <Card title={'Sign In'}
+                style={{
+                    minWidth: 500,
+                    maxWidth: '50%'
+                }} bordered={true} >
+                <Image
+                    preview={false}
+                    style={{
+                        maxWidth: 800,
+                        paddingBottom: '24px'
+                    }}
+                    src={'logo'}
+                />
+                <Form
+                    name="signIn"
+                    labelCol={{ span: 6 }}
+                    wrapperCol={{ span: 16 }}
+                    style={{ maxWidth: 800 }}
+                    initialValues={{ remember: true }}
+                    onFinish={onFinish}
+                    autoComplete="off"
+                >
+                    <Form.Item<UserLoginScheme>
+                        label={t('Email')}
+                        name="email"
+                        rules={[{ required: true, message: t("common.input-error") }]}
+                    >
+                        <Input />
+                    </Form.Item>
+
+                    <Form.Item<UserLoginScheme>
+                        label={t('Password')}
+                        name="password"
+                        rules={[{ required: true, message: t("common.input-error") }]}
+                    >
+                        <Input.Password />
+                    </Form.Item>
+                    <Form.Item wrapperCol={{ offset: 6, span: 16 }}>
+                        <Button type="primary" htmlType="submit">
+                            {t('Sign in')}
+                        </Button>
+                    </Form.Item>
+                </Form>
+            </Card>
+        </Flex>
+    )
 };
-
-const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
-  console.log('Failed:', errorInfo);
-};
-
-const Login: React.FC = () => (
-  <Form
-    name="basic"
-    labelCol={{ span: 8 }}
-    wrapperCol={{ span: 16 }}
-    style={{ maxWidth: 600 }}
-    initialValues={{ remember: true }}
-    onFinish={onFinish}
-    onFinishFailed={onFinishFailed}
-    autoComplete="off"
-  >
-    <Form.Item<FieldType>
-      label="Username"
-      name="username"
-      rules={[{ required: true, message: 'Please input your username!' }]}
-    >
-      <Input />
-    </Form.Item>
-
-    <Form.Item<FieldType>
-      label="Password"
-      name="password"
-      rules={[{ required: true, message: 'Please input your password!' }]}
-    >
-      <Input.Password />
-    </Form.Item>
-
-    <Form.Item<FieldType>
-      name="remember"
-      valuePropName="checked"
-      wrapperCol={{ offset: 8, span: 16 }}
-    >
-      <Checkbox>Remember me</Checkbox>
-    </Form.Item>
-
-    <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-      <Button type="primary" htmlType="submit">
-        Submit
-      </Button>
-    </Form.Item>
-  </Form>
-);
 
 export default Login;

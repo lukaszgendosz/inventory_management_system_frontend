@@ -52,3 +52,9 @@ export enum Role {
     department_id?: number | null;
   }
   
+  export interface PaginationResponseSchemeUserResponseScheme {
+    /** Total Pages */
+    total_pages: number;
+    /** Data */
+    data: UserResponseScheme[];
+  }
