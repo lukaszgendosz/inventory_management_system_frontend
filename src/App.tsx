@@ -1,40 +1,26 @@
 import React from "react";
-import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Login from "./pages/login";
-import Users from "./pages/users";
-import { Role } from "./models/user";
-import RequireAuth from "./utils/RequireAuth";
-import PersistLogin from "./utils/PersistLogin";
+import AppRoutes from "./routes/AppRoutes";
+import { ConfigProvider, theme } from "antd";
 import Navbar from "./components/navbar";
-import UserTable from "./components/userTable";
+import { useTheme } from "./hooks/useTheme";
+import { useAuth } from "./hooks/useAuth";
 
 const App: React.FC = () => {
+  const {themeMode} = useTheme();
+  const {auth} = useAuth();
   return (
-      <Router>
-        <Routes>
-        <Route path="/login" element={<Login />} />
-        </Routes>
-          <Navbar>
+    <ConfigProvider
+      theme={{ algorithm: themeMode === "dark" ? theme.darkAlgorithm : theme.defaultAlgorithm }}
+    >
+        <Router>
           <Routes>
             <Route path="/login" element={<Login />} />
-            <Route element={<PersistLogin/>}>
-                <Route element={<RequireAuth allowedRoles={[Role.User, Role.Manager, Role.Admin]} />}>
-                  <Route path="/me" element={< h1/>} />
-                </Route>
-
-                <Route element={<RequireAuth allowedRoles={[Role.Manager, Role.Admin]} />}>
-                  <Route path="/users" element={<UserTable />} />
-                </Route>
-
-                <Route element={<RequireAuth allowedRoles={[Role.Admin]} />}>
-                  <Route path="/admin" element={< h1 />} />
-                </Route>
-
-                <Route path="*" element={<Navigate to="/login" />} />
-              </Route>
+            <Route path="/*" element={<Navbar><AppRoutes /></Navbar>} />
           </Routes>
-          </Navbar>
-      </Router>
+        </Router>
+      </ConfigProvider>
   );
 };
 export default App;

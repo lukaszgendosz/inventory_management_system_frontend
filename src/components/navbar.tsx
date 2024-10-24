@@ -1,38 +1,53 @@
-import { Menu } from 'antd';
-import { useNavigate } from 'react-router-dom';
-import { UserOutlined } from '@ant-design/icons';
+import React, { useState } from 'react';
+import { Layout, theme } from 'antd';
 
+import LayoutHeader from './layoutHeader';
+import LayoutSider from './layoutSider';
+
+const { Content} = Layout;
 interface NavbarProps {
-    children?: React.ReactNode;
+  children?: React.ReactNode;
 }
 
-const navItems = [
-  { name: "Me", path: "/mee" },
-  { name: "Assets", path: "/assets" },
-  { name: "Users", path: "/users" },
-  { name: "Locations", path: "/locations" },
-  { name: "Admin", path: "/admin" },
-];
-
 const Navbar: React.FC<NavbarProps> = ({ children }) => {
-    const navigate = useNavigate();
+    
+  const {
+    token: { colorBgContainer, borderRadiusLG },} = theme.useToken();
 
-    return (
-        <>
-            <Menu mode="horizontal" style={{ justifyContent: 'right' }}>
-                {navItems.map(item => <Menu.Item key={item.path} onClick={() => navigate(item.path)}>{item.name}</Menu.Item>)}
-                <Menu.SubMenu
-                    title={
-                            <UserOutlined />
-                    }
-                >
-                    <Menu.Item key="logout" onClick={() => navigate('/logout')}>Logout</Menu.Item>
-                </Menu.SubMenu>
-            </Menu>
+  const [collapsed, setCollapsed] = useState(false);
+  return (
+    <Layout style={{ minHeight: '100vh', maxHeight: '100vh' }}>
+
+      <LayoutSider collapsed={collapsed} />
+      <Layout style={{ flex: 1, display: 'flex' }}>
+
+      <LayoutHeader collapsed={collapsed} setCollapsed={setCollapsed} />
+
+        <Layout
+          style={{
+            padding: '25px 25px 25px',
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+        >
+          <Content
+            style={{
+              padding: 0,
+              margin: 0,
+              background: colorBgContainer,
+              borderRadius: borderRadiusLG,
+              overflow: 'auto',
+              flex: 1,
+              flexDirection: 'column'
+            }}
+          >
             {children}
-        </>
-    );
+          </Content>
+        </Layout>
+      </Layout>
+    </Layout>
+  );
 };
 
 export default Navbar;
-

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import { useNavigate, useLocation } from "react-router-dom";
-import { PaginationResponseSchemeUserResponseScheme} from "../models/user";
+import { UsersResponseScheme} from "../models/user";
 import { UserResponseScheme } from "../models/user";
 import userTable from "../components/userTable";
 
@@ -17,7 +17,7 @@ const Users = () => {
 
         const getUsers = async () => {
             try {
-                const response = await axiosPrivate<PaginationResponseSchemeUserResponseScheme>({
+                const response = await axiosPrivate<UsersResponseScheme>({
                     url: '/api/v1/users',
                     signal: controller.signal
                 });
