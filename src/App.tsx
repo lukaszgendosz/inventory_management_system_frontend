@@ -5,11 +5,9 @@ import AppRoutes from "./routes/AppRoutes";
 import { ConfigProvider, theme } from "antd";
 import Navbar from "./components/navbar";
 import { useTheme } from "./hooks/useTheme";
-import { useAuth } from "./hooks/useAuth";
 
 const App: React.FC = () => {
   const {themeMode} = useTheme();
-  const {auth} = useAuth();
   return (
     <ConfigProvider
       theme={{ algorithm: themeMode === "dark" ? theme.darkAlgorithm : theme.defaultAlgorithm }}
