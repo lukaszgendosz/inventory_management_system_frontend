@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import type { GetProp, TableProps } from 'antd';
-import { Table, Input, Modal, Typography } from 'antd';
+import { Table, Input, Typography, message } from 'antd';
 import type { SorterResult } from 'antd/es/table/interface';
-import { UserResponseScheme, UsersResponseScheme } from '../models/user';
 import { EditFilled } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import { FaTrash } from "react-icons/fa";
-import useDebounce from '../hooks/useDebounce';
-import useUserService from '../services/api/users';
-import DeleteModal from './deleteModal';
-
+import { FaArchive } from "react-icons/fa";
+import { AxiosError } from 'axios';
+import useDebounce from '../../hooks/useDebounce';
+import { CompanyResponseScheme } from '../../models/company';
+import useCompanyService from '../../services/api/companies';
+import { LocationResponseScheme } from '../../models/location';
+import { SortOrder } from '../../utils/constraints';
 
 const { Text } = Typography;
 type TablePaginationConfig = Exclude<GetProp<TableProps, 'pagination'>, boolean>;
@@ -23,7 +24,7 @@ interface TableParams {
   filters?: Parameters<GetProp<TableProps, 'onChange'>>[1];
   search?: string;
 }
-const UserTable: React.FC = () => {
+const CompaniesPage: React.FC = () => {
   const [tableParams, setTableParams] = useState<TableParams>({
     pagination: {
       current: 1,
@@ -31,47 +32,40 @@ const UserTable: React.FC = () => {
     },
     search: '',
   });
-  const { getUsers } = useUserService();
-  const [data, setData] = useState<UserResponseScheme[]>([]);
+  const { getCompanies, deleteCompany } = useCompanyService();
+  const [data, setData] = useState<CompanyResponseScheme[]>([]);
+  const [selectedCompany, setSelectedCompany] = useState<CompanyResponseScheme | null>();
   const [loading, setLoading] = useState(false);
   const debouncedSearch = useDebounce(tableParams.search, 500);
   const navigate = useNavigate();
-  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
-  const [selectedUser, setSelectedUser] = useState<UserResponseScheme | null>(null);
+  const [isModalVisible, setIsModalOpen] = useState<boolean>(false);
+  
 
-  const columns: ColumnsType<UserResponseScheme> = [
+
+
+  const columns: ColumnsType<CompanyResponseScheme> = [
+    {
+      title: 'ID',
+      dataIndex: 'id',
+      sorter: true,
+      align: 'center'
+    },
     {
       title: 'Name',
+      dataIndex: 'name',
       sorter: true,
-      render: (record) => (
-        <a>{record.first_name} {record.last_name}</a>
-      ),
-      onCell: (record) => ({
-        onClick: () => navigate(`/users/${record.id}`),
-      }),
-    },
-    {
-      title: 'Email',
-      sorter: true,
-      dataIndex: 'email',
       align: 'center'
     },
     {
-      title: 'Role',
+      title: 'Created At',
+      dataIndex: 'created_at',
       sorter: true,
-      dataIndex: 'role',
       align: 'center'
     },
     {
-      title: 'Location',
+      title: 'Updated At',
+      dataIndex: 'updated_at',
       sorter: true,
-      render: (record) => record.location ? record.location.name : "Not assigned",
-      align: 'center'
-    },
-    {
-      title: 'Company',
-      sorter: true,
-      render: (record) => record.company ? record.company.name : "Not assigned",
       align: 'center'
     },
     {
@@ -85,9 +79,9 @@ const UserTable: React.FC = () => {
           style={{ marginRight: 16, cursor: 'pointer', color: '#1668dc' }}
           onClick={() => handleEdit(record)}
         />
-        <FaTrash
+        <FaArchive
           style={{ cursor: 'pointer', color: '#dc4446' }}
-          onClick={() => {setSelectedUser(record); setIsModalVisible(true);}}
+          onClick={() => {setSelectedCompany(record); setIsModalOpen(true);}}
         />
       </div>
       ),
@@ -96,33 +90,17 @@ const UserTable: React.FC = () => {
   
   ];
   ;
-  const handleDelete = () => {
-    setIsModalVisible(false);
-    setSelectedUser(null);
-  };
-  const handleEdit = (record: UserResponseScheme) => {
-    navigate(`/users/edit/${record.id}`);
-  };
 
-  const handleTableChange: TableProps<UserResponseScheme>['onChange'] = (pagination, filters, sorter) => {
-    setTableParams((prevTableParams) => ({
-      ...prevTableParams,
-      pagination: {
-        ...prevTableParams.pagination,
-        current: pagination.current,
-        pageSize: pagination.pageSize,
-      },
-      filters,
-      sortOrder: Array.isArray(sorter) ? undefined : sorter.order,
-      sortField: Array.isArray(sorter) ? undefined : sorter.field,
-    }));
-  };
-  const fetchUsersData = () => {
+
+  const fetchCompanyData = () => {
     setLoading(true);
-    getUsers({
+    getCompanies({
       page: tableParams.pagination?.current, 
       page_size:tableParams.pagination?.pageSize, 
-      search: debouncedSearch})
+      search: debouncedSearch,
+      order_by: Array.isArray(tableParams.sortField) ? tableParams.sortField.join('.') : tableParams.sortField?.toString(),
+      sort_order: tableParams.sortOrder === 'descend' ? SortOrder.DESC : SortOrder.ASC,
+    })
       .then((results) => results.data)
       .then(({ total_pages, data }) => {
         setData(data);
@@ -139,10 +117,47 @@ const UserTable: React.FC = () => {
         setLoading(false)
         console.error(err);
       })
-      
   };
 
-  useEffect(fetchUsersData, [
+
+
+
+  const handleDelete = (companyId: number) => {
+    deleteCompany(companyId)
+      .then((response) => {
+        if (!(response instanceof AxiosError)) {
+          message.success('Company deleted successfully.');
+          fetchCompanyData();
+        }
+        else {
+          message.error('Failed to delete company.');
+        }
+      })
+    
+    setIsModalOpen(false);
+    setSelectedCompany(null);
+    
+  };
+
+  const handleEdit = (record: CompanyResponseScheme) => {
+    navigate(`/companies/${record.id}/edit`);
+  };
+
+  const handleTableChange: TableProps<CompanyResponseScheme>['onChange'] = (pagination, filters, sorter) => {
+    setTableParams((prevTableParams) => ({
+      ...prevTableParams,
+      pagination: {
+        ...prevTableParams.pagination,
+        current: pagination.current,
+        pageSize: pagination.pageSize,
+      },
+      filters,
+      sortOrder: Array.isArray(sorter) ? undefined : sorter.order,
+      sortField: Array.isArray(sorter) ? undefined : sorter.field,
+    }));
+  };
+
+  useEffect(fetchCompanyData, [
     tableParams.pagination?.current,
     tableParams.pagination?.pageSize,
     tableParams?.sortOrder,
@@ -150,6 +165,7 @@ const UserTable: React.FC = () => {
     JSON.stringify(tableParams.filters),
     debouncedSearch,
   ]);
+
 
   
 
@@ -165,7 +181,7 @@ const UserTable: React.FC = () => {
   };
 
   return (
-      <><Table<UserResponseScheme>
+      <><Table<CompanyResponseScheme>
       scroll={{ y: 'calc(100vh - 297px)', x: 1000 }}
       columns={columns}
       rowKey={(record) => record.id}
@@ -182,7 +198,7 @@ const UserTable: React.FC = () => {
       onChange={handleTableChange}
       title={() => (
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <Text strong style={{ fontSize: '20px' }}>Users</Text>
+          <Text strong style={{ fontSize: '20px' }}>Companies</Text>
           <Input
             placeholder="Search"
             value={tableParams.search}
@@ -190,14 +206,9 @@ const UserTable: React.FC = () => {
             style={{ width: 200 }} />
         </div>
       )} />
-      <DeleteModal
-        isModalOpen={isModalVisible}
-        setIsModalOpen={setIsModalVisible}
-        selectedItem={selectedUser ? `${selectedUser?.first_name} ${selectedUser?.last_name}` : null}
-        onConfirm={handleDelete}/>
       </>
   );
 };
 
-export default UserTable;
+export default CompaniesPage;
 

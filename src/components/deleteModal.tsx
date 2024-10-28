@@ -7,11 +7,11 @@ interface DeleteModalProps {
     onConfirm: () => void
 }
 
-const DeleteModal: React.FC<DeleteModalProps> = ( { isModalOpen, setIsModalOpen, selectedItem, onConfirm }) => {
+const DeactivateModal: React.FC<DeleteModalProps> = ( { isModalOpen, setIsModalOpen, selectedItem, onConfirm }) => {
    
     return (
         <Modal
-        title={<strong>Confirm Deletion</strong>}
+        title={<strong>Confirm deactivation</strong>}
         open={isModalOpen}
         onOk={onConfirm}
         onCancel={() => setIsModalOpen(false)}
@@ -21,9 +21,9 @@ const DeleteModal: React.FC<DeleteModalProps> = ( { isModalOpen, setIsModalOpen,
         centered
         style={{ top: window.innerHeight < 600 ? 20  : -250 }}
       >
-        <p>Are you sure you want to delete <strong>{selectedItem}</strong>?</p>
+        <p>Are you sure you want to deactivate <strong>{selectedItem}</strong>?</p>
       </Modal>
     )
 }
 
-export default DeleteModal
+export default DeactivateModal

@@ -1,10 +1,13 @@
 import React from 'react';
 import { Route, Routes, Navigate } from 'react-router-dom';
-import UserTable from '../components/userTable';
+import UsersPage from '../pages/users/usersPage';
+import UserEditPage from '../pages/users/userEdit';
 import RequireAuth from '../utils/RequireAuth';
 import PersistLogin from '../utils/PersistLogin';
 import { Role } from '../models/user';
 import Login from '../pages/login';
+import UserDetails from '../pages/users/userDetails';
+import CompaniesPage from '../pages/companies/companiesPage';
 
 const AppRoutes: React.FC = () => {
   return (
@@ -18,10 +21,13 @@ const AppRoutes: React.FC = () => {
         </Route>
         
         <Route element={<RequireAuth allowedRoles={[Role.Manager, Role.Admin]} />}>
-          <Route path="/users" element={<UserTable />} />
+          <Route path="/users" element={<UsersPage />} />
+          <Route path="/users/:id" element={<UserDetails />} />
+          <Route path="/companies" element={<CompaniesPage />} />
         </Route>
 
         <Route element={<RequireAuth allowedRoles={[Role.Admin]} />}>
+          <Route path="/users/:id/edit" element={<UserEditPage />} />
           <Route path="/admin" element={<h1 />} />
         </Route>
 

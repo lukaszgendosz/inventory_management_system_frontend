@@ -13,3 +13,8 @@ export interface DepartmentCreateScheme {
   export interface DepartmentUpdateScheme {
     name: string;
   }
+
+  export interface DepartmentsResponseScheme {
+    total_pages: number;
+    data: DepartmentResponseScheme[];
+  }

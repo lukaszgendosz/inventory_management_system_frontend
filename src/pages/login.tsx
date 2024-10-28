@@ -37,6 +37,7 @@ const Login: React.FC = () => {
         <Flex style={{
             width: '100vw',
             height: '100vh',
+
         }} justify="center" align="center">
             <Card title={'Sign In'}
                 style={{

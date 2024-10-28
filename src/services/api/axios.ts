@@ -1,5 +1,6 @@
 import axios from 'axios';
-const BASE_URL = 'http://localhost:5000';
+import qs from 'qs';
+import { BASE_URL } from '../../utils/constraints';
 
 export enum ContentType {
     Json = "application/json",
@@ -14,5 +15,7 @@ export default axios.create({
 
 export const axiosPrivate = axios.create({
     baseURL: BASE_URL,
-    // withCredentials: true
+    paramsSerializer: (params) => {
+        return qs.stringify(params, { arrayFormat: 'repeat', skipNulls: true, encode: true });
+      },
 });
