@@ -52,7 +52,7 @@ const LayoutHeader: React.FC<LayoutHeaderProps> = ( { collapsed, setCollapsed })
                     unCheckedChildren={<SunOutlined />} 
                     checked={themeMode === 'dark'} 
                     onChange={toggleTheme} 
-                    style={{float: 'right'}}/>
+                    />
                     </Col>
                     
                     <Col><Dropdown menu={userMenu} placement="bottomRight" trigger={['click']}>

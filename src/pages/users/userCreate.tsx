@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Form, type FormProps, Input, Flex, Card, Select, message, Switch } from 'antd';
 import { useNavigate, useParams } from 'react-router-dom';
-import { UserResponseScheme, UserUpdateScheme } from '../../models/user';
+import { UserCreateScheme } from '../../models/user';
 import useUserService from '../../services/api/users';
 import useLocationService from '../../services/api/locations';
 import useCompanyService from '../../services/api/companies';
@@ -18,16 +18,15 @@ const t = (arg: string) => {
   return arg;
 };
 
-const UserEditPage: React.FC = () => {
+const UserCreatePage: React.FC = () => {
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const { id } = useParams();
-  const { getUser, updateUser, deactivateUser, activateUser } = useUserService();
+  const { createUser } = useUserService();
   const { getLocations } = useLocationService();
   const { getCompanies } = useCompanyService();
   const { getDepartments } = useDepartmentService();
 
-  const [user, setUser] = useState<UserResponseScheme>();
   const [isFirstLoad, setIsFirstLoad] = useState<boolean>(true);
   const [locations, setLocations] = useState<LocationResponseScheme[]>([]);
   const [companies, setCompanies] = useState<CompanyResponseScheme[]>([]);
@@ -39,66 +38,26 @@ const UserEditPage: React.FC = () => {
   const debouncedCompaniesSearch = useDebounce(companiesSearch, 250);
   const debouncedLocationsSearch = useDebounce(locationsSearch, 250);
 
-  const onFinish: FormProps<UserUpdateScheme>["onFinish"] = async (values) => {
+  const onFinish: FormProps<UserCreateScheme>["onFinish"] = async (values) => {
     try {
-      const { is_active, ...restValues } = values;
       const updatedValues = {
-        ...restValues,
-        location_id: restValues.location_id === 0 ? null : restValues.location_id,
-        company_id: restValues.company_id === 0 ? null : restValues.company_id,
-        department_id: restValues.department_id === 0 ? null : restValues.department_id,
+        ...values,
+        location_id: values.location_id === 0 ? null : values.location_id,
+        company_id: values.company_id === 0 ? null : values.company_id,
+        department_id: values.department_id === 0 ? null : values.department_id,
       };
+      const user = await createUser(updatedValues);
 
-      await updateUser(Number(id), updatedValues);
-      if (is_active && is_active !== user?.is_active) {
-        await activateUser(Number(id));
-      }
-      if (!is_active && is_active !== user?.is_active) {
-        await deactivateUser(Number(id));
-      }
+
 
       message.success('User updated successfully!');
-      navigate('/users'); 
+      setIsFirstLoad(false)
+      navigate(`/users/${user.data.id}`); 
     } catch (error) {
       message.error('Failed to update user.');
     }
   };
 
-  const fetchUserData = async () => {
-    try {
-      const response = await getUser(Number(id));
-      const userData = response.data;
-      setUser(userData);
-
-      
-      form.setFieldsValue({
-        email: userData.email,
-        first_name: userData.first_name,
-        last_name: userData.last_name,
-        notes: userData.notes,
-        role: userData.role,
-        location_id: userData.location?.id ?? 0,
-        company_id: userData.company?.id ?? 0,
-        department_id: userData.department?.id ?? 0,
-        is_active: userData.is_active !== undefined ? userData.is_active : true,
-      });
-
-      if (userData.location?.id && userData.location?.name) {
-        setLocations([userData.location]);
-      }
-
-      if (userData.company?.id && userData.company?.name) {
-        setCompanies([userData.company]);
-      }
-
-      if (userData.department?.id && userData.department?.name) {
-        setDepartments([userData.department]);
-      }
-      setIsFirstLoad(false);
-    } catch (error) {
-      message.error('Failed to fetch user data.');
-    }
-  };
   const fetchLocations = async () => {
     try {
       const result = await getLocations({ 'page': 1, 'page_size': 25, search: debouncedLocationsSearch });
@@ -126,10 +85,6 @@ const UserEditPage: React.FC = () => {
     }
   };
 
-
-  useEffect(() => {
-    fetchUserData();
-  }, []);
 
   useEffect(() => {
     if (!isFirstLoad) fetchLocations();
@@ -172,39 +127,50 @@ const UserEditPage: React.FC = () => {
           onFinish={onFinish}
           autoComplete="off"
         >
-          <Form.Item<UserUpdateScheme>
+          <Form.Item<UserCreateScheme>
             label={t('Email')}
             name="email"
+            rules={[{ required: true, message: 'Enter email address!' }]}
           >
             <Input />
           </Form.Item>
 
-          <Form.Item<UserUpdateScheme>
+          <Form.Item<UserCreateScheme>
             label={t('First name')}
             name="first_name"
+            rules={[{ required: true, message: 'Enter first name!' }]}
           >
             <Input />
           </Form.Item>
 
-          <Form.Item<UserUpdateScheme>
+          <Form.Item<UserCreateScheme>
             label={t('Last name')}
             name="last_name"
+            rules={[{ required: true, message: 'Enter last name!' }]}
           >
             <Input />
           </Form.Item>
 
-          <Form.Item<UserUpdateScheme>
+          <Form.Item<UserCreateScheme>
+            label={t('Password')}
+            name="password"
+            rules={[{ required: true, message: 'Enter last name!' }]}
+          >
+            <Input.Password />
+          </Form.Item>
+
+          <Form.Item<UserCreateScheme>
             label={t('Role')}
             name="role"
           >
-            <Select>
-              <Option key="admin" value="admin">Admin</Option>
-              <Option key="manager" value="manager">Manager</Option>
+            <Select defaultValue={'user'}>
               <Option key="user" value="user">User</Option>
+              <Option key="manager" value="manager">Manager</Option>
+              <Option key="admin" value="admin">Admin</Option>
             </Select>
           </Form.Item>
 
-          <Form.Item<UserUpdateScheme>
+          <Form.Item<UserCreateScheme>
             label={t('Location')}
             name="location_id"
           >
@@ -235,7 +201,7 @@ const UserEditPage: React.FC = () => {
             </Select>
           </Form.Item>
 
-          <Form.Item<UserUpdateScheme>
+          <Form.Item<UserCreateScheme>
             label={t('Company')}
             name="company_id"
           >
@@ -265,7 +231,7 @@ const UserEditPage: React.FC = () => {
             </Select>
           </Form.Item>
 
-          <Form.Item<UserUpdateScheme>
+          <Form.Item<UserCreateScheme>
             label={t('Department')}
             name="department_id"
           >
@@ -297,16 +263,17 @@ const UserEditPage: React.FC = () => {
           </Form.Item>
 
 
-          <Form.Item<UserUpdateScheme>
+          <Form.Item<UserCreateScheme>
             label={t('Notes')}
             name="notes"
           >
             <Input.TextArea />
           </Form.Item>
-          <Form.Item<UserUpdateScheme>
+          <Form.Item<UserCreateScheme>
             label={t('Active')}
             name="is_active"
             valuePropName="checked"
+            initialValue={true}
           >
             <Switch />
           </Form.Item>
@@ -322,4 +289,4 @@ const UserEditPage: React.FC = () => {
   );
 };
 
-export default UserEditPage;
+export default UserCreatePage;

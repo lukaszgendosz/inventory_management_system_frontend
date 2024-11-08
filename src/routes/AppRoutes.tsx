@@ -8,6 +8,7 @@ import { Role } from '../models/user';
 import Login from '../pages/login';
 import UserDetails from '../pages/users/userDetails';
 import CompaniesPage from '../pages/companies/companiesPage';
+import UserCreatePage from '../pages/users/userCreate';
 
 const AppRoutes: React.FC = () => {
   return (
@@ -28,6 +29,7 @@ const AppRoutes: React.FC = () => {
 
         <Route element={<RequireAuth allowedRoles={[Role.Admin]} />}>
           <Route path="/users/:id/edit" element={<UserEditPage />} />
+          <Route path="/users/create" element={<UserCreatePage />} />
           <Route path="/admin" element={<h1 />} />
         </Route>
 

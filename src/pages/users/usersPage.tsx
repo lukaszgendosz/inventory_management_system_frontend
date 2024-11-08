@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import type { GetProp, TableProps } from 'antd';
-import { Table, Input, Typography, message } from 'antd';
+import { Table, Input, Typography, message, Row, Col, Button } from 'antd';
 import type { SorterResult } from 'antd/es/table/interface';
 import { EditFilled } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
+import { Route, Router, useNavigate } from 'react-router-dom';
 import { FaArchive } from "react-icons/fa";
 import { AxiosError } from 'axios';
 import { UserResponseScheme } from '../../models/user';
@@ -16,6 +16,7 @@ import { CompanyResponseScheme } from '../../models/company';
 import useCompanyService from '../../services/api/companies';
 import useLocationService from '../../services/api/locations';
 import { SortOrder } from '../../utils/constraints';
+import create from '@ant-design/icons/lib/components/IconFont';
 
 const { Text } = Typography;
 type TablePaginationConfig = Exclude<GetProp<TableProps, 'pagination'>, boolean>;
@@ -36,6 +37,9 @@ const UsersPage: React.FC = () => {
       pageSize: 25,
     },
     search: '',
+    sortField: 'first_name',
+    sortOrder: 'ascend',
+    filters: {is_active: [true]},
   });
   const { getCompanies } = useCompanyService();
   const { getLocations } = useLocationService();
@@ -56,6 +60,7 @@ const UsersPage: React.FC = () => {
       key: 'name',
       dataIndex: 'first_name',
       sorter: true,
+      defaultSortOrder: 'ascend',
       render: (text, record) => (
         <a>{record.first_name} {record.last_name}</a>
       ),
@@ -109,6 +114,7 @@ const UsersPage: React.FC = () => {
       dataIndex: 'is_active',
       sorter: true,
       render: (text, record) => record.is_active ? "Active" : "Inactive",
+      defaultFilteredValue: [true],
       align: 'center',
       filters: [
         { text: 'Active', value: true },
@@ -138,7 +144,6 @@ const UsersPage: React.FC = () => {
   ];
   ;
 
-
   const fetchUsersData = () => {
     setLoading(true);
     getUsers({
@@ -147,6 +152,7 @@ const UsersPage: React.FC = () => {
       search: debouncedSearch,
       order_by: Array.isArray(tableParams.sortField) ? tableParams.sortField.join('.') : tableParams.sortField?.toString(),
       sort_order: tableParams.sortOrder === 'descend' ? SortOrder.DESC : SortOrder.ASC,
+      role: Array.isArray(tableParams.filters?.role) ? tableParams.filters?.role.map(String) : null,
       is_active: Array.isArray(tableParams.filters?.is_active) ? tableParams.filters?.is_active.map(String) : null,
       company_id: Array.isArray(tableParams.filters?.company_id) ? tableParams.filters?.company_id.map(String) : null,
       location_id: Array.isArray(tableParams.filters?.location_id) ? tableParams.filters?.location_id.map(String) : null
@@ -259,18 +265,20 @@ const UsersPage: React.FC = () => {
         pageSize: tableParams.pagination?.pageSize,
         total: tableParams.pagination?.total,
         position: ['bottomCenter'],
-        pageSizeOptions: ['25', '50', '100'],
+        pageSizeOptions: ['25', '50', '100', '200'],
       }}
       onChange={handleTableChange}
       title={() => (
-        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <Text strong style={{ fontSize: '20px' }}>Users</Text>
-          <Input
+        <Row
+          gutter={{xs: 8, sm: 16}}>
+          <Col flex="auto"><Text strong style={{ fontSize: '20px' }}>Users</Text></Col>
+          <Col><Input
             placeholder="Search"
             value={tableParams.search}
             onChange={(e) => onSearch(e.target.value)}
-            style={{ width: 200 }} />
-        </div>
+            style={{ width: 150 }} /></Col>
+            <Col><Button type="primary" onClick={() => navigate('/users/create')}>Create</Button></Col>
+        </Row>
       )} />
       <DeactivateModal
         isModalOpen={isModalVisible}

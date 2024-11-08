@@ -1,4 +1,4 @@
-import { UsersResponseScheme, UserCreateScheme, UserResponseScheme, UserUpdateScheme } from '../../models/user';
+import { UsersResponseScheme, UserCreateScheme, UserResponseScheme, UserUpdateScheme, Role } from '../../models/user';
 import { ContentType } from "./axios";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { AxiosResponse } from "axios";
@@ -15,8 +15,7 @@ interface userQueryParams {
   company_id: Array<string> | null;
   location_id: Array<string> | null;
   is_active: Array<string> | null;
-
-
+  role: Array<string> | null;
 }
 
 const useUserService = () => {
@@ -39,7 +38,8 @@ const useUserService = () => {
           sort_order: queryParams.sort_order,
           is_active: queryParams.is_active,
           company_id: queryParams.company_id,
-          location_id: queryParams.location_id
+          location_id: queryParams.location_id,
+          role: queryParams.role
         },
       }); 
 

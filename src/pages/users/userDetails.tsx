@@ -2,11 +2,10 @@
 
 import React, { useEffect } from 'react';
 import { Button, Card, Col, Descriptions, message, Row, Space, Tag, Typography } from 'antd';
-import { UserResponseScheme } from '../../models/user';
+import { Role, UserResponseScheme } from '../../models/user';
 import { CompanyResponseScheme } from '../../models/company';
 import { LocationResponseScheme } from '../../models/location';
 import { DepartmentResponseScheme } from '../../models/department';
-import { Role } from '../../models/user';
 import useUserService from '../../services/api/users';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -23,7 +22,7 @@ const UserDetails: React.FC = () => {
   const navigate = useNavigate();
   const { getUser } = useUserService();
   const [user, setUser] = React.useState<UserResponseScheme | null>(null);
-  const renderActiveStatus = (isActive: boolean) => {
+  const renderActiveStatus = (isActive: boolean | undefined) => {
     return isActive ? (
       <Tag color="green">Active</Tag>
     ) : (
@@ -42,10 +41,10 @@ const UserDetails: React.FC = () => {
     }
   };
 
-useEffect(() => {
-  fetchUserData(),
-  []
-})
+  useEffect(() => {
+    fetchUserData()
+  },[]
+  );
 
   return (
     <Card
@@ -66,7 +65,6 @@ useEffect(() => {
           {renderDescriptionItem('First Name', user?.first_name)}
           {renderDescriptionItem('Last Name', user?.last_name)}
           {renderDescriptionItem('Role', user?.role)}
-          {user?.notes && renderDescriptionItem('Notes', user?.notes)}
           {renderDescriptionItem(
             'Company',
             user?.company ? (user?.company as CompanyResponseScheme).name : 'N/A'
@@ -80,6 +78,7 @@ useEffect(() => {
             user?.department ? (user?.department as DepartmentResponseScheme).name : 'N/A'
           )}
           {renderDescriptionItem('Status', renderActiveStatus(user?.is_active))}
+          {renderDescriptionItem('Notes', user?.notes)}
         </Descriptions>
         </Col>
         
