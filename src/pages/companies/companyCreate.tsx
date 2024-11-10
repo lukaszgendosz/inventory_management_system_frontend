@@ -1,19 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { Button, Form, type FormProps, Input, Flex, Card, Select, message, Switch } from 'antd';
-import { useNavigate, useParams } from 'react-router-dom';
-import { UserCreateScheme } from '../../models/user';
+import React from 'react';
+import { Button, Form, type FormProps, Input, Flex, Card, message } from 'antd';
+import { useNavigate } from 'react-router-dom';
 import {CompanyCreateScheme} from '../../models/company';
-import useUserService from '../../services/api/users';
-import useLocationService from '../../services/api/locations';
 import useCompanyService from '../../services/api/companies';
-import useDepartmentService from '../../services/api/departments';
-import { LocationResponseScheme } from '../../models/location';
-import { DepartmentResponseScheme } from '../../models/department';
-import { CompanyResponseScheme } from '../../models/company';
-import useDebounce from '../../hooks/useDebounce';
-import { SortOrder } from '../../utils/constraints';
 
-const { Option } = Select;
 
 const t = (arg: string) => {
   return arg;
@@ -30,7 +20,7 @@ const CompanyCreatePage: React.FC = () => {
 
   const onFinish: FormProps<CompanyCreateScheme>["onFinish"] = async (values) => {
     try {
-      const user = await createCompany(values);
+      await createCompany(values);
 
       message.success('Company created successfully!');
       navigate(`/companies`); 
