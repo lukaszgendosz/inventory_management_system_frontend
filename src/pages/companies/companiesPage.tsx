@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import type { GetProp, TableProps } from 'antd';
-import { Table, Input, Typography, message } from 'antd';
+import { Table, Input, Typography, message, Row, Col, Button } from 'antd';
 import type { SorterResult } from 'antd/es/table/interface';
 import { EditFilled } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
@@ -197,14 +197,16 @@ const CompaniesPage: React.FC = () => {
       }}
       onChange={handleTableChange}
       title={() => (
-        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <Text strong style={{ fontSize: '20px' }}>Companies</Text>
-          <Input
+        <Row
+          gutter={{xs: 8, sm: 16}}>
+          <Col flex="auto"><Text strong style={{ fontSize: '20px' }}>Companies</Text></Col>
+          <Col><Input
             placeholder="Search"
             value={tableParams.search}
             onChange={(e) => onSearch(e.target.value)}
-            style={{ width: 200 }} />
-        </div>
+            style={{ width: 150 }} /></Col>
+            <Col><Button type="primary" onClick={() => navigate('/companies/create')}>Create</Button></Col>
+        </Row>
       )} />
       </>
   );
