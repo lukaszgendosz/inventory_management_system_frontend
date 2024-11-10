@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Form, type FormProps, Input, Flex, Card, Select, message, Switch } from 'antd';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { UserCreateScheme } from '../../models/user';
 import useUserService from '../../services/api/users';
 import useLocationService from '../../services/api/locations';
@@ -21,7 +21,6 @@ const t = (arg: string) => {
 const UserCreatePage: React.FC = () => {
   const navigate = useNavigate();
   const [form] = Form.useForm();
-  const { id } = useParams();
   const { createUser } = useUserService();
   const { getLocations } = useLocationService();
   const { getCompanies } = useCompanyService();

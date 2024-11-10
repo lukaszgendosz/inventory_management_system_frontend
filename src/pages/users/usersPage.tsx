@@ -9,7 +9,7 @@ import { AxiosError } from 'axios';
 import { UserResponseScheme } from '../../models/user';
 import useUserService  from '../../services/api/users';
 import useDebounce from '../../hooks/useDebounce';
-import DeactivateModal from '../../components/deleteModal';
+import DeactivateModal from '../../components/deactivateModal';
 import { Role } from '../../models/user';
 import { LocationResponseScheme } from '../../models/location';
 import { CompanyResponseScheme } from '../../models/company';
@@ -284,7 +284,9 @@ const UsersPage: React.FC = () => {
         isModalOpen={isModalVisible}
         setIsModalOpen={setIsModalOpen}
         selectedItem={selectedUser ? `${selectedUser?.first_name} ${selectedUser?.last_name}` : null}
-        onConfirm={() => handleDelete(selectedUser!.id)}/>
+        onConfirm={() => handleDelete(selectedUser!.id)}
+        title='Confirm deactivation'
+        message='Are you sure you want to deactivate'/>
       </>
   );
 };
