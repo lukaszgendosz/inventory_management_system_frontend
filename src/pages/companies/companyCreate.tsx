@@ -22,30 +22,17 @@ const t = (arg: string) => {
 const CompanyCreatePage: React.FC = () => {
   const navigate = useNavigate();
   const [form] = Form.useForm();
-  const { createUser } = useUserService();
-  const { getLocations } = useLocationService();
   const { createCompany } = useCompanyService();
-  const { getDepartments } = useDepartmentService();
 
-  const [isFirstLoad, setIsFirstLoad] = useState<boolean>(true);
-  const [locations, setLocations] = useState<LocationResponseScheme[]>([]);
-  const [companies, setCompanies] = useState<CompanyResponseScheme[]>([]);
-  const [departments, setDepartments] = useState<DepartmentResponseScheme[]>([]);
-  const [departmentsSearch, setDepartmentsSearch] = useState<string>('');
-  const [companiesSearch, setCompaniesSearch] = useState<string>('');
-  const [locationsSearch, setLocationsSearch] = useState<string>('');
-  const debouncedDepartmentsSearch = useDebounce(departmentsSearch, 250);
-  const debouncedCompaniesSearch = useDebounce(companiesSearch, 250);
-  const debouncedLocationsSearch = useDebounce(locationsSearch, 250);
+
+
+ 
 
   const onFinish: FormProps<CompanyCreateScheme>["onFinish"] = async (values) => {
     try {
       const user = await createCompany(values);
 
-
-
       message.success('Company created successfully!');
-      setIsFirstLoad(false)
       navigate(`/companies`); 
     } catch (error) {
       message.error('Failed to create company.');

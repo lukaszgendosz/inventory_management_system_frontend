@@ -4,13 +4,13 @@ import { Table, Input, Typography, message, Row, Col, Button } from 'antd';
 import type { SorterResult } from 'antd/es/table/interface';
 import { EditFilled } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import { FaArchive } from "react-icons/fa";
+import { FaTrash } from "react-icons/fa";
 import { AxiosError } from 'axios';
 import useDebounce from '../../hooks/useDebounce';
 import { CompanyResponseScheme } from '../../models/company';
 import useCompanyService from '../../services/api/companies';
-import { LocationResponseScheme } from '../../models/location';
 import { SortOrder } from '../../utils/constraints';
+import DeactivateModal from '../../components/deactivateModal';
 
 const { Text } = Typography;
 type TablePaginationConfig = Exclude<GetProp<TableProps, 'pagination'>, boolean>;
@@ -79,7 +79,7 @@ const CompaniesPage: React.FC = () => {
           style={{ marginRight: 16, cursor: 'pointer', color: '#1668dc' }}
           onClick={() => handleEdit(record)}
         />
-        <FaArchive
+        <FaTrash
           style={{ cursor: 'pointer', color: '#dc4446' }}
           onClick={() => {setSelectedCompany(record); setIsModalOpen(true);}}
         />
@@ -130,7 +130,7 @@ const CompaniesPage: React.FC = () => {
           fetchCompanyData();
         }
         else {
-          message.error('Failed to delete company.');
+          message.error(response.response?.data.msg.replace(/'/g, ""));
         }
       })
     
@@ -208,6 +208,13 @@ const CompaniesPage: React.FC = () => {
             <Col><Button type="primary" onClick={() => navigate('/companies/create')}>Create</Button></Col>
         </Row>
       )} />
+            <DeactivateModal
+        isModalOpen={isModalVisible}
+        setIsModalOpen={setIsModalOpen}
+        selectedItem={selectedCompany ? selectedCompany?.name : null}
+        onConfirm={() => handleDelete(selectedCompany!.id)}
+        title='Confirm deletion'
+        message='Are you sure you want to delete company'/>
       </>
   );
 };
