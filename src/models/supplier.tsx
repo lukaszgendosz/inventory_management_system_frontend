@@ -21,3 +21,8 @@ export interface SupplierUpdateScheme {
     support_phone?: string | null;
     support_email?: string | null;
 }
+
+export interface SuppliersResponseScheme {
+    total_pages: number;
+    data: SupplierResponseScheme[];
+  }

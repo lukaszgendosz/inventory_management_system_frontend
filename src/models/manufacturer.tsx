@@ -23,3 +23,8 @@ export interface ManufacturerCreateScheme {
     support_phone?: string | null;
     support_email?: string | null;
   }
+
+  export interface ManufacturersResponseScheme {
+    total_pages: number;
+    data: ManufacturerResponseScheme[];
+  }
