@@ -23,6 +23,9 @@ import SuppliersPage from '../pages/suppliers/suppliersPage';
 import ModelCreatePage from '../pages/models/modelCreate';
 import ModelEditPage from '../pages/models/modelEdit';
 import ModelsPage from '../pages/models/modelsPage';
+import ManufacturersPage from '../pages/manufacturers/manufacturersPage';
+import ManufacturerCreatePage from '../pages/manufacturers/manufacturersCreate';
+import ManufacturerEditPage from '../pages/manufacturers/manufacturersEdit';
 
 const AppRoutes: React.FC = () => {
   return (
@@ -43,6 +46,7 @@ const AppRoutes: React.FC = () => {
           <Route path="/departments" element={<DepartmentsPage />} />
           <Route path="/suppliers" element={<SuppliersPage />} />
           <Route path="/models" element={<ModelsPage />} />
+          <Route path="/manufacturers" element={<ManufacturersPage />} />
         </Route>
 
         <Route element={<RequireAuth allowedRoles={[Role.Admin]} />}>
@@ -58,7 +62,8 @@ const AppRoutes: React.FC = () => {
           <Route path="/suppliers/:id/edit" element={<SupplierEditPage />} />
           <Route path="/models/create" element={<ModelCreatePage />} />
           <Route path="/models/:id/edit" element={<ModelEditPage />} />
-          <Route path="/admin" element={<h1 />} />
+          <Route path="/manufacturers/create" element={<ManufacturerCreatePage />} />
+          <Route path="/manufacturers/:id/edit" element={<ManufacturerEditPage />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/me" replace />} />
