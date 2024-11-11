@@ -1,15 +1,15 @@
 // UserDetails.tsx
 
 import React, { useEffect } from 'react';
-import { Button, Card, Col, Descriptions, Flex, message, Row, Space, Tag, Typography } from 'antd';
-import { Role, UserResponseScheme } from '../../models/user';
+import { Button, Card, Col, Descriptions, message, Row, Tag, Typography } from 'antd';
+import { UserResponseScheme } from '../../models/user';
 import { CompanyResponseScheme } from '../../models/company';
 import { LocationResponseScheme } from '../../models/location';
 import { DepartmentResponseScheme } from '../../models/department';
 import useUserService from '../../services/api/users';
 import { useNavigate, useParams } from 'react-router-dom';
 
-const { Title, Paragraph } = Typography;
+const { Title } = Typography;
 
 
 const renderDescriptionItem = (label: string, value: React.ReactNode) => (
