@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Form, type FormProps, Input, Flex, Card, message } from 'antd';
+import { Button, Form, type FormProps, Input, Flex, Card, message, Row, Col } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import {CompanyCreateScheme} from '../../models/company';
 import useCompanyService from '../../services/api/companies';
@@ -69,9 +69,10 @@ const CompanyCreatePage: React.FC = () => {
           </Form.Item>
 
           <Form.Item wrapperCol={{ offset: 6, span: 16 }}>
-            <Button type="primary" htmlType="submit" style={{ float: 'right' }}>
-              {t('Submit')}
-            </Button>
+          <Row justify="space-between">
+              <Col><Button onClick={() => navigate('/companies')}>{t('Cancel')}</Button></Col>
+              <Col><Button type="primary" htmlType="submit" style={{ float: 'right' }}>{t('Submit')}</Button></Col>
+          </Row>
           </Form.Item>
         </Form>
       </Card>

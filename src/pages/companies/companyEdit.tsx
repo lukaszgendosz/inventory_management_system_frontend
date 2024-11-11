@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Button, Form, type FormProps, Input, Flex, Card, message } from 'antd';
+import { Button, Form, type FormProps, Input, Flex, Card, message, Row, Col } from 'antd';
 import { useNavigate, useParams } from 'react-router-dom';
 import { CompanyUpdateScheme } from '../../models/company';
 
@@ -89,9 +89,10 @@ const CompanyEditPage: React.FC = () => {
           </Form.Item>
 
           <Form.Item wrapperCol={{ offset: 6, span: 16 }}>
-            <Button type="primary" htmlType="submit" style={{ float: 'right' }}>
-              {t('Submit')}
-            </Button>
+            <Row justify="space-between">
+              <Col><Button onClick={() => navigate('/companies')}>{t('Cancel')}</Button></Col>
+              <Col><Button type="primary" htmlType="submit" style={{ float: 'right' }}>{t('Submit')}</Button></Col>
+            </Row>
           </Form.Item>
         </Form>
       </Card>

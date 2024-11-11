@@ -14,10 +14,6 @@ const LocationCreatePage: React.FC = () => {
   const [form] = Form.useForm();
   const { createLocation } = useLocationService();
 
-
-
- 
-
   const onFinish: FormProps<LocationCreateScheme>["onFinish"] = async (values) => {
     try {
       await createLocation(values);
