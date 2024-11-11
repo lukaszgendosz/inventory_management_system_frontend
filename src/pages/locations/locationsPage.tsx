@@ -119,8 +119,8 @@ const LocationsPage: React.FC = () => {
 
 
 
-  const handleDelete = (companyId: number) => {
-    deleteLocation(companyId)
+  const handleDelete = (locationId: number) => {
+    deleteLocation(locationId)
       .then((response) => {
         if (!(response instanceof AxiosError)) {
           message.success('Location deleted successfully.');
@@ -211,7 +211,7 @@ const LocationsPage: React.FC = () => {
         selectedItem={selectedLocation ? selectedLocation?.name : null}
         onConfirm={() => handleDelete(selectedLocation!.id)}
         title='Confirm deletion'
-        message='Are you sure you want to delete company'/>
+        message='Are you sure you want to delete location'/>
       </>
   );
 };
