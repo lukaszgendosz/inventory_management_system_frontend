@@ -31,9 +31,9 @@ const useCompanyService = () => {
       return err;
     } 
   }
-  const getCompany = async (companyId: number) :Promise<AxiosResponse<CompaniesResponseScheme, any>> => {
+  const getCompany = async (companyId: number) :Promise<AxiosResponse<CompanyResponseScheme, any>> => {
     try {
-      const response  = await axiosPrivate<CompaniesResponseScheme>({
+      const response  = await axiosPrivate<CompanyResponseScheme>({
         url: `/api/v1/companies/${companyId}`,
         method: "GET",
         headers: {
@@ -85,8 +85,8 @@ const useCompanyService = () => {
   const deleteCompany = async (companyId: number) :Promise<AxiosResponse<CompanyResponseScheme, any>> => {
     try {
       const response  = await axiosPrivate<CompanyResponseScheme>({
-        url: `/api/v1/companies/${companyId}/delete`,
-        method: "PATCH",
+        url: `/api/v1/companies/${companyId}`,
+        method: "DELETE",
         headers: {
           "Content-Type": ContentType.Json,
         },

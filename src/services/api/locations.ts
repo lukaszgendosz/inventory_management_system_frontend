@@ -7,6 +7,8 @@ interface queryParams {
   page: number | undefined;
   page_size: number | undefined;
   search: string | undefined;
+  order_by: string | undefined;
+  sort_order: string | undefined;
 }
 
 const useLocationService = () => {
@@ -83,11 +85,11 @@ const useLocationService = () => {
     } 
   }
 
-  const deactivateLocation = async (locationId: number) :Promise<AxiosResponse<LocationResponseScheme, any>> => {
+  const deleteLocation = async (locationId: number) :Promise<AxiosResponse<LocationResponseScheme, any>> => {
     try {
       const response  = await axiosPrivate<LocationResponseScheme>({
-        url: `/api/v1/locations/${locationId}/deactivate`,
-        method: "PATCH",
+        url: `/api/v1/locations/${locationId}`,
+        method: "DELETE",
         headers: {
           "Content-Type": ContentType.Json,
         },
@@ -108,7 +110,7 @@ const useLocationService = () => {
     getLocation,
     createLocation,
     updateLocation,
-    deactivateLocation
+    deleteLocation
   }
 
 };
