@@ -1,7 +1,7 @@
 // UserDetails.tsx
 
 import React, { useEffect } from 'react';
-import { Button, Card, Col, Descriptions, message, Row, Space, Tag, Typography } from 'antd';
+import { Button, Card, Col, Descriptions, Flex, message, Row, Space, Tag, Typography } from 'antd';
 import { Role, UserResponseScheme } from '../../models/user';
 import { CompanyResponseScheme } from '../../models/company';
 import { LocationResponseScheme } from '../../models/location';
@@ -13,7 +13,7 @@ const { Title, Paragraph } = Typography;
 
 
 const renderDescriptionItem = (label: string, value: React.ReactNode) => (
-  <Descriptions.Item label={label}>{value}</Descriptions.Item>
+  <Descriptions.Item span={1} label={label}>{value} </Descriptions.Item>
 );
 
 
@@ -52,11 +52,11 @@ const UserDetails: React.FC = () => {
       bordered={false}
       style={{ width: '100%', height: '100%',margin: '0 auto' }}
     >
-      <Row gutter={[16, 16]} justify="center">
-      <Col xs={24} md={16} lg={16} style={{maxWidth: '60%'}}>
+      <Row gutter={[16, 16]}>
+      <Col xs={24} md={16} lg={16} style={{maxWidth: '25%'}} offset={10}>
         <Descriptions
-          
           bordered
+          
           column={1}
           size="default"
           layout="horizontal"
@@ -82,13 +82,16 @@ const UserDetails: React.FC = () => {
         </Descriptions>
         </Col>
         
-        <Col>
-        <Space direction="vertical" style={{ width: '100%' }}>
+        <Col span={1} offset={0}>
             <Button type="primary" onClick={() => navigate(`/users/${id}/edit`)} block>
               Edit
             </Button>
-          </Space>
         </Col>
+      </Row>
+      <Row>
+        <Button style={{ marginTop: '20px', maxWidth: '100px'}} type="primary" onClick={() => navigate('/users')} block>
+          Back
+        </Button>
       </Row>
     </Card>
   );

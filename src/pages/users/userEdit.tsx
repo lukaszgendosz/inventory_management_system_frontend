@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Form, type FormProps, Input, Flex, Card, Select, message, Switch } from 'antd';
+import { Button, Form, type FormProps, Input, Flex, Card, Select, message, Switch, Row, Col } from 'antd';
 import { useNavigate, useParams } from 'react-router-dom';
 import { UserResponseScheme, UserUpdateScheme } from '../../models/user';
 import useUserService from '../../services/api/users';
@@ -101,7 +101,7 @@ const UserEditPage: React.FC = () => {
   };
   const fetchLocations = async () => {
     try {
-      const result = await getLocations({ 'page': 1, 'page_size': 25, search: debouncedLocationsSearch });
+      const result = await getLocations({ 'page': 1, 'page_size': 25, search: debouncedLocationsSearch, order_by: 'name', sort_order: SortOrder.ASC });
       setLocations(result.data.data);
     } catch (error) {
       message.error('Failed to fetch locations.');
@@ -119,7 +119,7 @@ const UserEditPage: React.FC = () => {
 
   const fetchDepartments = async () => {
     try {
-      const result = await getDepartments({ 'page': 1, 'page_size': 25, search: debouncedDepartmentsSearch });
+      const result = await getDepartments({ 'page': 1, 'page_size': 25, search: debouncedDepartmentsSearch, order_by: 'name', sort_order: SortOrder.ASC });
       setDepartments(result.data.data);
     } catch (error) {
       message.error('Failed to fetch departments.');
@@ -312,9 +312,10 @@ const UserEditPage: React.FC = () => {
           </Form.Item>
 
           <Form.Item wrapperCol={{ offset: 6, span: 16 }}>
-            <Button type="primary" htmlType="submit" style={{ float: 'right' }}>
-              {t('Submit')}
-            </Button>
+            <Row justify="space-between">
+              <Col><Button onClick={() => navigate('/users')}>{t('Cancel')}</Button></Col>
+              <Col><Button type="primary" htmlType="submit" style={{ float: 'right' }}>{t('Submit')}</Button></Col>
+            </Row>
           </Form.Item>
         </Form>
       </Card>

@@ -3,7 +3,7 @@ import type { GetProp, TableProps } from 'antd';
 import { Table, Input, Typography, message, Row, Col, Button } from 'antd';
 import type { SorterResult } from 'antd/es/table/interface';
 import { EditFilled } from '@ant-design/icons';
-import { Route, Router, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { FaArchive } from "react-icons/fa";
 import { AxiosError } from 'axios';
 import { UserResponseScheme } from '../../models/user';
@@ -16,7 +16,6 @@ import { CompanyResponseScheme } from '../../models/company';
 import useCompanyService from '../../services/api/companies';
 import useLocationService from '../../services/api/locations';
 import { SortOrder } from '../../utils/constraints';
-import create from '@ant-design/icons/lib/components/IconFont';
 
 const { Text } = Typography;
 type TablePaginationConfig = Exclude<GetProp<TableProps, 'pagination'>, boolean>;
@@ -179,7 +178,7 @@ const UsersPage: React.FC = () => {
 
   const fetchLocations = async () => {
     try {
-      const result = await getLocations({ 'page': 1, 'page_size': 500, search: '' });
+      const result = await getLocations({ 'page': 1, 'page_size': 500, search: '', order_by: 'name', sort_order: SortOrder.ASC });
       setLocations(result.data.data);
     } catch (error) {
       message.error('Failed to fetch locations.');

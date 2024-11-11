@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Form, type FormProps, Input, Flex, Card, Select, message, Switch } from 'antd';
+import { Button, Form, type FormProps, Input, Flex, Card, Select, message, Switch, Row, Col } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { UserCreateScheme } from '../../models/user';
 import useUserService from '../../services/api/users';
@@ -49,17 +49,17 @@ const UserCreatePage: React.FC = () => {
 
 
 
-      message.success('User updated successfully!');
+      message.success('User created successfully!');
       setIsFirstLoad(false)
       navigate(`/users/${user.data.id}`); 
     } catch (error) {
-      message.error('Failed to update user.');
+      message.error('Failed to create user.');
     }
   };
 
   const fetchLocations = async () => {
     try {
-      const result = await getLocations({ 'page': 1, 'page_size': 25, search: debouncedLocationsSearch });
+      const result = await getLocations({ 'page': 1, 'page_size': 25, search: debouncedLocationsSearch, order_by: 'name', sort_order: SortOrder.ASC });
       setLocations(result.data.data);
     } catch (error) {
       message.error('Failed to fetch locations.');
@@ -77,7 +77,7 @@ const UserCreatePage: React.FC = () => {
 
   const fetchDepartments = async () => {
     try {
-      const result = await getDepartments({ 'page': 1, 'page_size': 25, search: debouncedDepartmentsSearch });
+      const result = await getDepartments({ 'page': 1, 'page_size': 25, search: debouncedDepartmentsSearch, order_by: 'name', sort_order: SortOrder.ASC });
       setDepartments(result.data.data);
     } catch (error) {
       message.error('Failed to fetch departments.');
@@ -153,7 +153,7 @@ const UserCreatePage: React.FC = () => {
           <Form.Item<UserCreateScheme>
             label={t('Password')}
             name="password"
-            rules={[{ required: true, message: 'Enter last name!' }]}
+            rules={[{ required: true, message: 'Enter password!' }]}
           >
             <Input.Password />
           </Form.Item>
@@ -278,9 +278,10 @@ const UserCreatePage: React.FC = () => {
           </Form.Item>
 
           <Form.Item wrapperCol={{ offset: 6, span: 16 }}>
-            <Button type="primary" htmlType="submit" style={{ float: 'right' }}>
-              {t('Submit')}
-            </Button>
+            <Row justify="space-between">
+              <Col><Button onClick={() => navigate('/users')}>{t('Cancel')}</Button></Col>
+              <Col><Button type="primary" htmlType="submit" style={{ float: 'right' }}>{t('Submit')}</Button></Col>
+            </Row>
           </Form.Item>
         </Form>
       </Card>
