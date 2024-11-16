@@ -1,4 +1,4 @@
-import { UsersResponseScheme, UserCreateScheme, UserResponseScheme, UserUpdateScheme, Role } from '../../models/user';
+import { UsersResponseScheme, UserCreateScheme, UserResponseScheme, UserUpdateScheme } from '../../models/user';
 import { ContentType } from "./axios";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { AxiosResponse } from "axios";
