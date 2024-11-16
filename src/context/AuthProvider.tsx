@@ -1,9 +1,9 @@
 import { createContext, useState, ReactNode, Dispatch, SetStateAction } from "react";
-import { Role } from "../models/user";
+import { UserResponseScheme } from "../models/user";
 
 interface AuthState {
     access_token?: string;
-    role?: Role;
+    current_user?: UserResponseScheme;
 }
 
 interface AuthContextType {

@@ -59,6 +59,7 @@ const ModelsPage: React.FC = () => {
     },
     {
       title: 'Manufacturer',
+      key: 'manufacturer',
       dataIndex: ['manufacturer', 'name'],
       filters: manufacturers.map((manufacturer) => ({ text: manufacturer.name, value: manufacturer.id })), 
       onFilterDropdownOpenChange: (visible) => {
@@ -95,12 +96,14 @@ const ModelsPage: React.FC = () => {
 
   const fetchModelData = () => {
     setLoading(true);
+    console.log(tableParams.filters);
     getModels({
       page: tableParams.pagination?.current, 
       page_size:tableParams.pagination?.pageSize, 
       search: debouncedSearch,
       order_by: Array.isArray(tableParams.sortField) ? tableParams.sortField.join('.') : tableParams.sortField?.toString(),
       sort_order: tableParams.sortOrder === 'descend' ? SortOrder.DESC : SortOrder.ASC,
+      manufacturer_id: tableParams.filters?.manufacturer ? tableParams.filters?.manufacturer.map(String) : null
     })
       .then((results) => results.data)
       .then(({ total_pages, data }) => {
@@ -119,6 +122,7 @@ const ModelsPage: React.FC = () => {
         console.error(err);
       })
   };
+
 
   const fetchManufacturers = async () => {
     try {

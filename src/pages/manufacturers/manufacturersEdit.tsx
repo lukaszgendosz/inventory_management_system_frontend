@@ -37,6 +37,9 @@ const ManufacturerEditPage: React.FC = () => {
       
       form.setFieldsValue({
         name: manufacturerData.name,
+        support_url: manufacturerData.support_url,
+        support_phone: manufacturerData.support_phone,
+        support_email: manufacturerData.support_email
       });
 
     } catch (error) {
@@ -87,6 +90,28 @@ const ManufacturerEditPage: React.FC = () => {
           >
             <Input />
           </Form.Item>
+
+          <Form.Item<ManufacturerUpdateScheme>
+            label={t('Support URL')}
+            name="support_url"
+          >
+            <Input />
+          </Form.Item>
+          
+          <Form.Item<ManufacturerUpdateScheme>
+            label={t('Support phone')}
+            name="support_phone"
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item<ManufacturerUpdateScheme>
+            label={t('Support email')}
+            name="support_email"
+          >
+            <Input />
+          </Form.Item>
+          
 
           <Form.Item wrapperCol={{ offset: 6, span: 16 }}>
             <Row justify="space-between">

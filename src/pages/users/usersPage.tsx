@@ -58,6 +58,7 @@ const UsersPage: React.FC = () => {
       title: 'Name',
       key: 'name',
       dataIndex: 'first_name',
+      align: 'center',
       sorter: true,
       defaultSortOrder: 'ascend',
       render: (text, record) => (
@@ -84,8 +85,10 @@ const UsersPage: React.FC = () => {
     },
     {
       title: 'Location',
+      key: 'location_id',
       dataIndex: ['location', 'name'],
       align: 'center',
+      filterSearch: true,
       filters: locations.map((location) => ({ text: location.name, value: location.id })),
       onFilterDropdownOpenChange: (visible) => {
         if (visible) {
@@ -113,7 +116,7 @@ const UsersPage: React.FC = () => {
       dataIndex: 'is_active',
       sorter: true,
       render: (text, record) => record.is_active ? "Active" : "Inactive",
-      defaultFilteredValue: [true],
+      defaultFilteredValue: ['true'],
       align: 'center',
       filters: [
         { text: 'Active', value: true },
@@ -145,6 +148,7 @@ const UsersPage: React.FC = () => {
 
   const fetchUsersData = () => {
     setLoading(true);
+    console.log(tableParams.filters);
     getUsers({
       page: tableParams.pagination?.current, 
       page_size:tableParams.pagination?.pageSize, 

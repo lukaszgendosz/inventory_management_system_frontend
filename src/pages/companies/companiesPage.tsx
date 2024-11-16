@@ -119,9 +119,6 @@ const CompaniesPage: React.FC = () => {
       })
   };
 
-
-
-
   const handleDelete = (companyId: number) => {
     deleteCompany(companyId)
       .then((response) => {

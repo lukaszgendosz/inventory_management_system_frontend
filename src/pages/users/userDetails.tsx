@@ -8,6 +8,7 @@ import { LocationResponseScheme } from '../../models/location';
 import { DepartmentResponseScheme } from '../../models/department';
 import useUserService from '../../services/api/users';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth';
 
 const { Title } = Typography;
 
@@ -18,6 +19,7 @@ const renderDescriptionItem = (label: string, value: React.ReactNode) => (
 
 
 const UserDetails: React.FC = () => {
+  const {auth} = useAuth();
   const { id } = useParams();
   const navigate = useNavigate();
   const { getUser } = useUserService();
@@ -32,8 +34,15 @@ const UserDetails: React.FC = () => {
 
   const fetchUserData = async () => {
     try {
-      const response = await getUser(Number(id));
-      const userData = response.data;
+      let userData: UserResponseScheme | null = null;
+      if (id === undefined) {
+        userData = auth.current_user ? auth.current_user : null;
+        console.log(userData)
+      } else {
+        const response = await getUser(Number(id));
+        userData = response.data;
+      }
+      console.log(userData, id);
       setUser(userData);
 
     } catch (error) {

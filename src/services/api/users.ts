@@ -22,7 +22,6 @@ const useUserService = () => {
   const axiosPrivate = useAxiosPrivate();
   
   const getUsers = async (queryParams: userQueryParams) :Promise<AxiosResponse<UsersResponseScheme, any>> => {
-    console.log(queryParams);
     try {
       const response  = await axiosPrivate<UsersResponseScheme>({
         url: "/api/v1/users",
@@ -41,6 +40,22 @@ const useUserService = () => {
           location_id: queryParams.location_id,
           role: queryParams.role
         },
+      }); 
+
+      return response;
+    } catch (err: any) {
+      return err;
+    } 
+  }
+  const getCurrentUser = async (access_token: string) :Promise<AxiosResponse<UserResponseScheme, any>> => {
+    try {
+      const response  = await axiosPrivate<UserResponseScheme>({
+        url: `/api/v1/users/me`,
+        method: "GET",
+        headers: {
+          "Content-Type": ContentType.Json,
+          "Authorization": `Bearer ${access_token}`
+        }
       }); 
 
       return response;
@@ -145,7 +160,8 @@ const useUserService = () => {
     createUser,
     updateUser,
     deactivateUser,
-    activateUser
+    activateUser,
+    getCurrentUser
   }
 
 };

@@ -4,6 +4,7 @@ import { UserLoginScheme } from '../models/user';
 import { onLogin } from '../services/api/auth';
 import { useNavigate } from 'react-router-dom';
 import {useAuth } from '../hooks/useAuth';
+import useUserService from '../services/api/users';
 
 const t = (arg: string) => {
   return arg
@@ -11,16 +12,21 @@ const t = (arg: string) => {
 
 const Login: React.FC = () => {
     const navigate = useNavigate()
+    const {getCurrentUser} = useUserService();
     const { setAuth } = useAuth();
 
 
     const onFinish: FormProps<UserLoginScheme>["onFinish"] = (values) => {
         try {
             onLogin!({email: values.email, password: values.password}).then(result => {
-                const { access_token, refresh_token, role } = result.data;
-                setAuth({access_token, role});
+                const { access_token, refresh_token } = result.data;
+                setAuth({access_token: access_token});
                 localStorage.setItem('refresh_token', refresh_token);
-                navigate('/users')
+                getCurrentUser(access_token).then(res => {
+                    const current_user = res.data
+                    setAuth({current_user: current_user});
+                });
+                navigate('/me');
             });
         } catch (error) {
             console.log(error)

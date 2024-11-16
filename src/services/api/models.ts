@@ -9,12 +9,14 @@ interface queryParams {
   search: string | undefined;
   order_by: string | undefined;
   sort_order: string | undefined;
+  manufacturer_id: Array<string> | null
 }
 
 const useModelService = () => {
   const axiosPrivate = useAxiosPrivate();
   
   const getModels = async (queryParams: queryParams) :Promise<AxiosResponse<ModelsResponseScheme, any>> => {
+    console.log(queryParams)
     try {
       const response  = await axiosPrivate<ModelsResponseScheme>({
         url: "/api/v1/models",
@@ -26,6 +28,7 @@ const useModelService = () => {
           page: queryParams.page,
           page_size: queryParams.page_size,
           search: queryParams.search,
+          manufacturer_id: queryParams.manufacturer_id
         },
       }); 
 

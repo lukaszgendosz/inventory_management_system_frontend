@@ -35,7 +35,7 @@ const AppRoutes: React.FC = () => {
       <Route element={<PersistLogin />}>
     
         <Route element={<RequireAuth allowedRoles={[Role.User, Role.Manager, Role.Admin]} />}>
-          <Route path="/me" element={<h1>Me</h1>} />
+          <Route path="/me" element={<UserDetails />} />
         </Route>
         
         <Route element={<RequireAuth allowedRoles={[Role.Manager, Role.Admin]} />}>

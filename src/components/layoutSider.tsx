@@ -5,26 +5,33 @@ import { AiOutlineProduct } from "react-icons/ai";
 import { BsBuilding } from "react-icons/bs";
 import { MdOutlineFactory } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
+import { Role } from "../models/user";
+import { useAuth } from "../hooks/useAuth";
 
 interface LayoutSiderProps {
     collapsed: boolean
   }
 
 const LayoutSider: React.FC<LayoutSiderProps> = ( { collapsed }) => {
+    const { auth } = useAuth(); 
     const navigate = useNavigate();
     const navItems = [
-        { name: 'Assets', path: '/assets', icon: <LaptopOutlined style={{ fontSize: '1.2rem' }} /> },
-        { name: 'Users', path: '/users', icon: <TeamOutlined style={{ fontSize: '1.2rem' }} /> },
-        { name: 'Locations', path: '/locations', icon: <EnvironmentOutlined style={{ fontSize: '1.2rem' }} /> },
-        { name: 'Departments', path: '/departments', icon: <GoldOutlined style={{ fontSize: '1.2rem' }} /> },
-        { name: 'Companies', path: '/companies', icon: <BsBuilding style={{ fontSize: '1.2rem' }} /> },
-        { name: 'Models', path: '/models', icon: <AiOutlineProduct style={{ fontSize: '1.2rem' }} /> },
-        { name: 'Suppliers', path: '/suppliers', icon: <TruckOutlined style={{ fontSize: '1.2rem' }} /> },
-        { name: 'Manufacturers', path: '/manufacturers', icon: <MdOutlineFactory style={{ fontSize: '1.2rem' }} /> }
+        { name: 'Assets', path: '/assets', icon: <LaptopOutlined style={{ fontSize: '1.2rem' }} />, roles: [ Role.Manager, Role.Admin] },
+        { name: 'Users', path: '/users', icon: <TeamOutlined style={{ fontSize: '1.2rem' }} />, roles: [Role.Manager, Role.Admin] },
+        { name: 'Locations', path: '/locations', icon: <EnvironmentOutlined style={{ fontSize: '1.2rem' }} />, roles: [Role.Manager, Role.Admin] },
+        { name: 'Departments', path: '/departments', icon: <GoldOutlined style={{ fontSize: '1.2rem' }} />, roles: [Role.Manager, Role.Admin] },
+        { name: 'Companies', path: '/companies', icon: <BsBuilding style={{ fontSize: '1.2rem' }} />, roles: [Role.Manager, Role.Admin] },
+        { name: 'Models', path: '/models', icon: <AiOutlineProduct style={{ fontSize: '1.2rem' }} />, roles: [Role.Manager, Role.Admin] },
+        { name: 'Suppliers', path: '/suppliers', icon: <TruckOutlined style={{ fontSize: '1.2rem' }} />, roles: [Role.Manager, Role.Admin] },
+        { name: 'Manufacturers', path: '/manufacturers', icon: <MdOutlineFactory style={{ fontSize: '1.2rem' }} />, roles: [Role.Manager, Role.Admin] }
     
       ];
+      const filteredNavItems = navItems.filter((item) =>
+        item.roles.includes(auth.current_user?.role as Role)
+      );
+    
 
-      const siderMenu: MenuProps['items'] = navItems.map((item) => ({
+      const siderMenu: MenuProps['items'] = filteredNavItems.map((item) => ({
         key: item.name.toLowerCase(),
         label: item.name,
         icon: item.icon,
