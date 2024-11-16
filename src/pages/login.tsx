@@ -5,6 +5,7 @@ import { onLogin } from '../services/api/auth';
 import { useNavigate } from 'react-router-dom';
 import {useAuth } from '../hooks/useAuth';
 import useUserService from '../services/api/users';
+import { useTheme } from '../hooks/useTheme';
 
 const t = (arg: string) => {
   return arg
@@ -14,6 +15,7 @@ const Login: React.FC = () => {
     const navigate = useNavigate()
     const {getCurrentUser} = useUserService();
     const { setAuth } = useAuth();
+    const { themeMode } = useTheme();
 
 
     const onFinish: FormProps<UserLoginScheme>["onFinish"] = (values) => {
@@ -43,11 +45,13 @@ const Login: React.FC = () => {
         <Flex style={{
             width: '100vw',
             height: '100vh',
+            backgroundColor: themeMode === 'dark' ? '#141414' : '#ffffff',
+            backgroundSize: 'cover',
 
         }} justify="center" align="center">
             <Card title={'Sign In'}
                 style={{
-                    minWidth: 500,
+                    minWidth: '25%',
                     maxWidth: '50%'
                 }} bordered={true} >
                 <Image
