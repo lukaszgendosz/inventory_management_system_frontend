@@ -57,13 +57,19 @@ const DepartmentsPage: React.FC = () => {
       title: 'Created At',
       dataIndex: 'created_at',
       sorter: true,
-      align: 'center'
+      align: 'center',
+      render: (text) => (
+        <span>{new Date(text).toLocaleString()}</span>
+      ),
     },
     {
       title: 'Updated At',
       dataIndex: 'updated_at',
       sorter: true,
-      align: 'center'
+      align: 'center',
+      render: (text) => (
+        <span>{new Date(text).toLocaleString()}</span>
+      ),
     },
     {
       title: 'Action',

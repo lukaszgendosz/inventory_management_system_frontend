@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Form, type FormProps, Input, Flex, Card, Select, message, Switch, Row, Col } from 'antd';
-import { useNavigate } from 'react-router-dom';
-import { UserCreateScheme } from '../../models/user';
-import useUserService from '../../services/api/users';
+import { Button, Form, type FormProps, Input, Flex, Card, Select, message, Switch, Row, Col, DatePicker, InputNumber } from 'antd';
+import { useNavigate, useParams } from 'react-router-dom';
+import { AssetResponseScheme, AssetUpdateScheme, Status } from '../../models/asset';
+import useAssetService from '../../services/api/assets';
 import useLocationService from '../../services/api/locations';
 import useCompanyService from '../../services/api/companies';
 import useDepartmentService from '../../services/api/departments';
@@ -18,14 +18,16 @@ const t = (arg: string) => {
   return arg;
 };
 
-const UserCreatePage: React.FC = () => {
+const AssetEditPage: React.FC = () => {
   const navigate = useNavigate();
   const [form] = Form.useForm();
-  const { createUser } = useUserService();
+  const { id } = useParams();
+  const { getAsset, updateAsset, deactivateAsset, activateAsset } = useAssetService();
   const { getLocations } = useLocationService();
   const { getCompanies } = useCompanyService();
   const { getDepartments } = useDepartmentService();
 
+  const [asset, setAsset] = useState<AssetResponseScheme>();
   const [isFirstLoad, setIsFirstLoad] = useState<boolean>(true);
   const [locations, setLocations] = useState<LocationResponseScheme[]>([]);
   const [companies, setCompanies] = useState<CompanyResponseScheme[]>([]);
@@ -37,26 +39,54 @@ const UserCreatePage: React.FC = () => {
   const debouncedCompaniesSearch = useDebounce(companiesSearch, 250);
   const debouncedLocationsSearch = useDebounce(locationsSearch, 250);
 
-  const onFinish: FormProps<UserCreateScheme>["onFinish"] = async (values) => {
+  const onFinish: FormProps<AssetUpdateScheme>["onFinish"] = async (values) => {
     try {
-      const updatedValues = {
-        ...values,
-        location_id: values.location_id === 0 ? null : values.location_id,
-        company_id: values.company_id === 0 ? null : values.company_id,
-        department_id: values.department_id === 0 ? null : values.department_id,
-      };
-      const user = await createUser(updatedValues);
+      await updateAsset(Number(id), values);
 
-
-
-      message.success('User created successfully!');
-      setIsFirstLoad(false)
-      navigate(`/users/${user.data.id}`); 
+      message.success('Asset updated successfully!');
+      navigate('/assets'); 
     } catch (error) {
-      message.error('Failed to create user.');
+      message.error('Failed to update asset.');
     }
   };
 
+  const fetchAssetData = async () => {
+    try {
+      const response = await getAsset(Number(id));
+      const assetData = response.data;
+      setAsset(assetData);
+
+      
+      form.setFieldsValue({
+        name: assetData.name,
+        serial_number: assetData.serial_number,
+        status: assetData.status,
+        checkout_type: assetData.checkout_type,
+        purchase_date: assetData.purchase_date,
+        purchase_cost: assetData.purchase_cost,
+        invoice_number: assetData.invoice_number,
+        varrianty_expiration_date: assetData.varrianty_expiration_date,
+        model_id: assetData.model?.id ?? null,
+        supplier_id: assetData.supplier?.id ?? null,
+        user_id: assetData.user?.id ?? null,
+        location_id: assetData.location?.id ?? null,
+        company_id: assetData.company?.id ?? null,
+        notes: assetData.notes,
+      });
+
+      if (assetData.location?.id && assetData.location?.name) {
+        setLocations([assetData.location]);
+      }
+
+      if (assetData.company?.id && assetData.company?.name) {
+        setCompanies([assetData.company]);
+      }
+
+      setIsFirstLoad(false);
+    } catch (error) {
+      message.error('Failed to fetch asset data.');
+    }
+  };
   const fetchLocations = async () => {
     try {
       const result = await getLocations({ 'page': 1, 'page_size': 25, search: debouncedLocationsSearch, order_by: 'name', sort_order: SortOrder.ASC });
@@ -86,6 +116,10 @@ const UserCreatePage: React.FC = () => {
 
 
   useEffect(() => {
+    fetchAssetData();
+  }, []);
+
+  useEffect(() => {
     if (!isFirstLoad) fetchLocations();
   }, [debouncedLocationsSearch]);
 
@@ -106,7 +140,7 @@ const UserCreatePage: React.FC = () => {
       align="top"
     >
       <Card
-        title={'Edit user'}
+        title={'Edit asset'}
         style={{
           width: 'calc(100%)',
           height: 'calc(100%)',
@@ -119,58 +153,66 @@ const UserCreatePage: React.FC = () => {
             marginLeft: 'auto',
             marginRight: 'auto',
           }}
-          name="editUser"
+          name="editAsset"
           form={form}
           labelCol={{ span: 6 }}
           wrapperCol={{ span: 16 }}
           onFinish={onFinish}
           autoComplete="off"
         >
-          <Form.Item<UserCreateScheme>
-            label={t('Email')}
-            name="email"
-            rules={[{ required: true, message: 'Enter email address!' }]}
+          <Form.Item<AssetUpdateScheme>
+            label={t('Name')}
+            name="name"
           >
             <Input />
           </Form.Item>
 
-          <Form.Item<UserCreateScheme>
-            label={t('First name')}
-            name="first_name"
-            rules={[{ required: true, message: 'Enter first name!' }]}
+          <Form.Item<AssetUpdateScheme>
+            label={t('Serial number')}
+            name="serial_number"
           >
             <Input />
           </Form.Item>
 
-          <Form.Item<UserCreateScheme>
-            label={t('Last name')}
-            name="last_name"
-            rules={[{ required: true, message: 'Enter last name!' }]}
+          <Form.Item<AssetUpdateScheme>
+            label={t('Status')}
+            name="status"
           >
-            <Input />
-          </Form.Item>
-
-          <Form.Item<UserCreateScheme>
-            label={t('Password')}
-            name="password"
-            rules={[{ required: true, message: 'Enter password!' }]}
-          >
-            <Input.Password />
-          </Form.Item>
-
-          <Form.Item<UserCreateScheme>
-            label={t('Role')}
-            name="role"
-            initialValue={'user'}
-          >
-            <Select>
-              <Option key="user" value="user">User</Option>
-              <Option key="manager" value="manager">Manager</Option>
-              <Option key="admin" value="admin">Admin</Option>
+            <Select
+              options={Object.entries(Status).map(([key, value]) => ({ label: t(`${key}`), value }))}>
+              
             </Select>
           </Form.Item>
+          
+          <Form.Item<AssetUpdateScheme>
+            label={t('Invoice number')}
+            name="invoice_number"
+          >
+            <Input />
+          </Form.Item>
+          
+          <Form.Item<AssetUpdateScheme>
+            label={t('Warranty expiration date')}
+            name="varrianty_expiration_date"
+          >
+            <DatePicker />
+          </Form.Item>
 
-          <Form.Item<UserCreateScheme>
+          <Form.Item<AssetUpdateScheme>
+            label={t('Purchase date')}
+            name="purchase_date"
+          >
+            <DatePicker />
+          </Form.Item>
+
+          <Form.Item<AssetUpdateScheme>
+            label={t('Purchase cost')}
+            name="purchase_cost"
+          >
+            <InputNumber  />
+          </Form.Item>
+
+          <Form.Item<AssetUpdateScheme>
             label={t('Location')}
             name="location_id"
           >
@@ -190,7 +232,7 @@ const UserCreatePage: React.FC = () => {
                   .includes(input.toLowerCase())
               }
             >
-              <Option key="none" value={0}>
+              <Option key="none" value={null}>
                 None
               </Option>
               {locations.map((location) => (
@@ -201,7 +243,7 @@ const UserCreatePage: React.FC = () => {
             </Select>
           </Form.Item>
 
-          <Form.Item<UserCreateScheme>
+          <Form.Item<AssetUpdateScheme>
             label={t('Company')}
             name="company_id"
           >
@@ -220,7 +262,7 @@ const UserCreatePage: React.FC = () => {
                   .includes(input.toLowerCase())
               }
             >
-              <Option key="none" value={0}>
+              <Option key="none" value={null}>
                 None
               </Option>
               {companies.map((company) => (
@@ -231,56 +273,18 @@ const UserCreatePage: React.FC = () => {
             </Select>
           </Form.Item>
 
-          <Form.Item<UserCreateScheme>
-            label={t('Department')}
-            name="department_id"
-          >
-            <Select 
-              
-              showSearch={true} 
-              onSearch={setDepartmentsSearch}
-              onDropdownVisibleChange={(open) => {
-                if (open) {
-                  fetchDepartments();
-                }
-              }}
-              optionFilterProp="children"
-              filterOption={(input, option) =>
-                (option?.children as unknown as string)
-                  .toLowerCase()
-                  .includes(input.toLowerCase())
-              }
-            >
-              <Option key="none" value={0}>
-                None
-              </Option>
-              {departments.map((department) => (
-                <Option key={department.id} value={department.id}>
-                  {department.name}
-                </Option>
-              ))}
-            </Select>
-          </Form.Item>
 
-
-          <Form.Item<UserCreateScheme>
+          <Form.Item<AssetUpdateScheme>
             label={t('Notes')}
             name="notes"
           >
             <Input.TextArea />
           </Form.Item>
-          <Form.Item<UserCreateScheme>
-            label={t('Active')}
-            name="is_active"
-            valuePropName="checked"
-            initialValue={true}
-          >
-            <Switch />
-          </Form.Item>
+
 
           <Form.Item wrapperCol={{ offset: 6, span: 16 }}>
             <Row justify="space-between">
-              <Col><Button onClick={() => navigate('/users')}>{t('Cancel')}</Button></Col>
+              <Col><Button onClick={() => navigate('/assets')}>{t('Cancel')}</Button></Col>
               <Col><Button type="primary" htmlType="submit" style={{ float: 'right' }}>{t('Submit')}</Button></Col>
             </Row>
           </Form.Item>
@@ -290,4 +294,4 @@ const UserCreatePage: React.FC = () => {
   );
 };
 
-export default UserCreatePage;
+export default AssetEditPage;

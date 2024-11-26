@@ -57,12 +57,17 @@ const UserDetails: React.FC = () => {
 
   return (
     <Card
-      title={<Title level={4}>User Details</Title>}
+      title={
+      <Row justify={'space-between'} align={'bottom'}>
+      <Col ><Title level={4}>User Details</Title></Col>
+      <Col style={{paddingBottom: '10px'}}><Button type="primary" onClick={() => navigate(`/users/${id}/edit`)} >Edit</Button></Col>
+      </Row>
+    }
       bordered={false}
       style={{ width: '100%', height: '100%',margin: '0 auto' }}
     >
-      <Row gutter={[16, 16]}>
-      <Col xs={24} md={16} lg={16} style={{maxWidth: '25%'}} offset={10}>
+      <Row gutter={[16, 16]} justify={'center'}>
+      <Col xs={24} md={16} lg={16} style={{maxWidth: '25%'}} >
         <Descriptions
           bordered
           
@@ -90,15 +95,9 @@ const UserDetails: React.FC = () => {
           {renderDescriptionItem('Notes', user?.notes)}
         </Descriptions>
         </Col>
-        
-        <Col span={1} offset={0}>
-            <Button type="primary" onClick={() => navigate(`/users/${id}/edit`)} block>
-              Edit
-            </Button>
-        </Col>
       </Row>
       <Row>
-        <Button style={{ marginTop: '20px', maxWidth: '100px'}} type="primary" onClick={() => navigate('/users')} block>
+        <Button style={{ marginTop: '20px', maxWidth: '100px'}} color='primary' variant='outlined' onClick={() => navigate('/users')} block>
           Back
         </Button>
       </Row>

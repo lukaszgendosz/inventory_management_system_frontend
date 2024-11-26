@@ -74,7 +74,7 @@ const Login: React.FC = () => {
                     <Form.Item<UserLoginScheme>
                         label={t('Email')}
                         name="email"
-                        rules={[{ required: true, message: t("common.input-error") }]}
+                        rules={[{ required: true, message: t("Enter your email.") }]}
                     >
                         <Input />
                     </Form.Item>
@@ -82,7 +82,7 @@ const Login: React.FC = () => {
                     <Form.Item<UserLoginScheme>
                         label={t('Password')}
                         name="password"
-                        rules={[{ required: true, message: t("common.input-error") }]}
+                        rules={[{ required: true, message: t("Enter your password.") }]}
                     >
                         <Input.Password />
                     </Form.Item>

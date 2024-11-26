@@ -4,13 +4,17 @@ import { Table, Input, Typography, message, Row, Col, Button } from 'antd';
 import type { SorterResult } from 'antd/es/table/interface';
 import { EditFilled } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import { FaTrash } from "react-icons/fa";
+import { FaArchive } from "react-icons/fa";
 import { AxiosError } from 'axios';
+import { AssetResponseScheme, Status } from '../../models/asset';
+import useAssetService from '../../services/api/assets';
 import useDebounce from '../../hooks/useDebounce';
+import DeactivateModal from '../../components/deactivateModal';
 import { LocationResponseScheme } from '../../models/location';
+import { CompanyResponseScheme } from '../../models/company';
+import useCompanyService from '../../services/api/companies';
 import useLocationService from '../../services/api/locations';
 import { SortOrder } from '../../utils/constraints';
-import DeactivateModal from '../../components/deactivateModal';
 
 const { Text } = Typography;
 type TablePaginationConfig = Exclude<GetProp<TableProps, 'pagination'>, boolean>;
@@ -24,52 +28,78 @@ interface TableParams {
   filters?: Parameters<GetProp<TableProps, 'onChange'>>[1];
   search?: string;
 }
-const LocationsPage: React.FC = () => {
+const AssetsPage: React.FC = () => {
   const [tableParams, setTableParams] = useState<TableParams>({
     pagination: {
       current: 1,
       pageSize: 25,
     },
     search: '',
+    sortField: 'name',
+    sortOrder: 'ascend',
+    filters: {is_active: [true]},
   });
-  const { getLocations, deleteLocation } = useLocationService();
-  const [data, setData] = useState<LocationResponseScheme[]>([]);
-  const [selectedLocation, setSelectedLocation] = useState<LocationResponseScheme | null>();
+  const { getCompanies } = useCompanyService();
+  const { getLocations } = useLocationService();
+  const { getAssets, deactivateAsset } = useAssetService();
+  const [data, setData] = useState<AssetResponseScheme[]>([]);
   const [loading, setLoading] = useState(false);
   const debouncedSearch = useDebounce(tableParams.search, 500);
   const navigate = useNavigate();
   const [isModalVisible, setIsModalOpen] = useState<boolean>(false);
-  
-  const columns: ColumnsType<LocationResponseScheme> = [
-    {
-      title: 'ID',
-      dataIndex: 'id',
-      sorter: true,
-      align: 'center'
-    },
+  const [selectedAsset, setSelectedAsset] = useState<AssetResponseScheme | null>(null);
+  const [locations, setLocations] = useState<LocationResponseScheme[]>([]);
+  const [companies, setCompanies] = useState<CompanyResponseScheme[]>([]);
+
+
+  const columns: ColumnsType<AssetResponseScheme> = [
     {
       title: 'Name',
       dataIndex: 'name',
+      align: 'center',
+      sorter: true,
+      defaultSortOrder: 'ascend',
+    },
+    {
+      title: 'Serial Number',
+      dataIndex: 'serial_number',
       sorter: true,
       align: 'center'
     },
     {
-      title: 'Created At',
-      dataIndex: 'created_at',
+      title: 'Status',
       sorter: true,
+      key: 'status',
+      render: (record) => record.status,
       align: 'center',
-      render: (text) => (
-        <span>{new Date(text).toLocaleString()}</span>
-      ),
+      filters: Object.entries(Status).map(([key, value]) => ({ text: key, value: value })),
     },
     {
-      title: 'Updated At',
-      dataIndex: 'updated_at',
-      sorter: true,
+      title: 'Location',
+      key: 'location_id',
+      dataIndex: ['location', 'name'],
       align: 'center',
-      render: (text) => (
-        <span>{new Date(text).toLocaleString()}</span>
-      ),
+      filterSearch: true,
+      filters: locations.map((location) => ({ text: location.name, value: location.id })),
+      onFilterDropdownOpenChange: (visible) => {
+        if (visible) {
+          fetchLocations();
+        }
+      }
+    },
+    {
+      title: 'Company',
+      key: 'company_id',
+      dataIndex: ['company', 'name'],
+      align: 'center',
+      filterSearch: true,
+      
+      filters: companies.map((company) => ({ text: company.name, value: company.id })),
+      onFilterDropdownOpenChange: (visible) => {
+        if (visible) {
+          fetchCompanies();
+        }
+      }
     },
     {
       title: 'Action',
@@ -82,9 +112,9 @@ const LocationsPage: React.FC = () => {
           style={{ marginRight: 16, cursor: 'pointer', color: '#1668dc' }}
           onClick={() => handleEdit(record)}
         />
-        <FaTrash
+        <FaArchive
           style={{ cursor: 'pointer', color: '#dc4446' }}
-          onClick={() => {setSelectedLocation(record); setIsModalOpen(true);}}
+          onClick={() => {setSelectedAsset(record); setIsModalOpen(true);}}
         />
       </div>
       ),
@@ -94,15 +124,19 @@ const LocationsPage: React.FC = () => {
   ];
   ;
 
-
-  const fetchLocationData = () => {
+  const fetchAssetsData = () => {
     setLoading(true);
-    getLocations({
+    console.log(tableParams.filters);
+    getAssets({
       page: tableParams.pagination?.current, 
       page_size:tableParams.pagination?.pageSize, 
       search: debouncedSearch,
       order_by: Array.isArray(tableParams.sortField) ? tableParams.sortField.join('.') : tableParams.sortField?.toString(),
       sort_order: tableParams.sortOrder === 'descend' ? SortOrder.DESC : SortOrder.ASC,
+      company_id: Array.isArray(tableParams.filters?.company_id) ? tableParams.filters?.company_id.map(String) : null,
+      location_id: Array.isArray(tableParams.filters?.location_id) ? tableParams.filters?.location_id.map(String) : null
+
+
     })
       .then((results) => results.data)
       .then(({ total_pages, data }) => {
@@ -122,31 +156,45 @@ const LocationsPage: React.FC = () => {
       })
   };
 
+  const fetchLocations = async () => {
+    try {
+      const result = await getLocations({ 'page': 1, 'page_size': 500, search: '', order_by: 'name', sort_order: SortOrder.ASC });
+      setLocations(result.data.data);
+    } catch (error) {
+      message.error('Failed to fetch locations.');
+    }
+  };
 
-
-
-  const handleDelete = (locationId: number) => {
-    deleteLocation(locationId)
+  const fetchCompanies = async () => {
+    try {
+      const result = await getCompanies({ 'page': 1, 'page_size': 500, search: '', order_by: 'name', sort_order: SortOrder.ASC });
+      setCompanies(result.data.data);
+    } catch (error) {
+      message.error('Failed to fetch companies.');
+    }
+  };
+  const handleDelete = (assetID: number) => {
+    deactivateAsset(assetID)
       .then((response) => {
         if (!(response instanceof AxiosError)) {
-          message.success('Location deleted successfully.');
-          fetchLocationData();
+          console.log('Asset deactivated');
+          fetchAssetsData();
         }
         else {
-          message.error(response.response?.data.msg.replace(/'/g, ""));
+          console.error(response.response?.data.msg);
         }
       })
     
     setIsModalOpen(false);
-    setSelectedLocation(null);
+    setSelectedAsset(null);
     
   };
 
-  const handleEdit = (record: LocationResponseScheme) => {
-    navigate(`/locations/${record.id}/edit`);
+  const handleEdit = (record: AssetResponseScheme) => {
+    navigate(`/assets/${record.id}/edit`);
   };
 
-  const handleTableChange: TableProps<LocationResponseScheme>['onChange'] = (pagination, filters, sorter) => {
+  const handleTableChange: TableProps<AssetResponseScheme>['onChange'] = (pagination, filters, sorter) => {
     setTableParams((prevTableParams) => ({
       ...prevTableParams,
       pagination: {
@@ -160,7 +208,7 @@ const LocationsPage: React.FC = () => {
     }));
   };
 
-  useEffect(fetchLocationData, [
+  useEffect(fetchAssetsData, [
     tableParams.pagination?.current,
     tableParams.pagination?.pageSize,
     tableParams?.sortOrder,
@@ -184,7 +232,7 @@ const LocationsPage: React.FC = () => {
   };
 
   return (
-      <><Table<LocationResponseScheme>
+      <><Table<AssetResponseScheme>
       scroll={{ y: 'calc(100vh - 297px)', x: 1000 }}
       columns={columns}
       rowKey={(record) => record.id}
@@ -196,31 +244,31 @@ const LocationsPage: React.FC = () => {
         pageSize: tableParams.pagination?.pageSize,
         total: tableParams.pagination?.total,
         position: ['bottomCenter'],
-        pageSizeOptions: ['25', '50', '100'],
+        pageSizeOptions: ['25', '50', '100', '200'],
       }}
       onChange={handleTableChange}
       title={() => (
         <Row
           gutter={{xs: 8, sm: 16}}>
-          <Col flex="auto"><Text strong style={{ fontSize: '20px' }}>Locations</Text></Col>
+          <Col flex="auto"><Text strong style={{ fontSize: '20px' }}>Assets</Text></Col>
           <Col><Input
             placeholder="Search"
             value={tableParams.search}
             onChange={(e) => onSearch(e.target.value)}
             style={{ width: 150 }} /></Col>
-            <Col><Button type="primary" onClick={() => navigate('/locations/create')}>Create</Button></Col>
+            <Col><Button type="primary" onClick={() => navigate('/assets/create')}>Create</Button></Col>
         </Row>
       )} />
-            <DeactivateModal
+      <DeactivateModal
         isModalOpen={isModalVisible}
         setIsModalOpen={setIsModalOpen}
-        selectedItem={selectedLocation ? selectedLocation?.name : null}
-        onConfirm={() => handleDelete(selectedLocation!.id)}
-        title='Confirm deletion'
-        message='Are you sure you want to delete location'/>
+        selectedItem={selectedAsset ? selectedAsset.serial_number : null}
+        onConfirm={() => handleDelete(selectedAsset!.id)}
+        title='Confirm deactivation'
+        message='Are you sure you want to deactivate'/>
       </>
   );
 };
 
-export default LocationsPage;
+export default AssetsPage;
 
