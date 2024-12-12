@@ -1,12 +1,13 @@
 import { CompanyResponseScheme } from "./company";
 import { LocationResponseScheme } from "./location";  
+import { ManufacturerResponseScheme } from "./manufacturer";
 import { ModelResponseScheme } from "./model";
 import { SupplierResponseScheme } from "./supplier";
 import { UserResponseScheme } from "./user";
 
 export enum Status {
     Available = "available",
-    CheckedOut = "checked_out",
+    Deployed = "deployed",
     Reserved = "reserved",
     Broken = "broken",
     Lost = "lost",
@@ -26,6 +27,7 @@ export interface AssetCreateScheme {
     location_id?: number | null;
     company_id?: number | null;
     supplier_id?: number | null;
+    manufacturer_id?: number | null;
     model_id?: number | null;
     user_id?: number | null;
   }
@@ -46,6 +48,7 @@ export interface AssetCreateScheme {
     supplier?: SupplierResponseScheme | null;
     user?: UserResponseScheme | null;
     asset?: AssetResponseScheme | null;
+    manufacturer?: ManufacturerResponseScheme | null;
     model?: ModelResponseScheme | null;
     location?: LocationResponseScheme | null;
   }
@@ -61,6 +64,7 @@ export interface AssetCreateScheme {
     invoice_number?: string | null;
     varrianty_expiration_date?: string | null;
     notes?: string | null;
+    manufacturer_id?: number | null;
     model_id?: number | null;
     supplier_id?: number | null;
     location_id?: number | null;

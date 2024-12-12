@@ -28,6 +28,9 @@ import ManufacturerCreatePage from '../pages/manufacturers/manufacturersCreate';
 import ManufacturerEditPage from '../pages/manufacturers/manufacturersEdit';
 import AssetsPage from '../pages/assets/assetsPage';
 import AssetEditPage from '../pages/assets/assetEdit';
+import AssetDetails from '../pages/assets/assetDetails';
+import AssetCreatePage from '../pages/assets/assetCreate';
+import DashboardPage from '../pages/dashboard/dashboardPage';
 
 const AppRoutes: React.FC = () => {
   return (
@@ -41,6 +44,7 @@ const AppRoutes: React.FC = () => {
         </Route>
         
         <Route element={<RequireAuth allowedRoles={[Role.Manager, Role.Admin]} />}>
+          <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/users" element={<UsersPage />} />
           <Route path="/users/:id" element={<UserDetails />} />
           <Route path="/companies" element={<CompaniesPage />} />
@@ -50,6 +54,9 @@ const AppRoutes: React.FC = () => {
           <Route path="/models" element={<ModelsPage />} />
           <Route path="/manufacturers" element={<ManufacturersPage />} />
           <Route path="/assets" element={<AssetsPage />} />
+          <Route path="/assets/:id/edit" element={<AssetEditPage />} />
+          <Route path="/assets/:id" element={<AssetDetails />} />
+          <Route path="/assets/create" element={<AssetCreatePage />} />
         </Route>
 
         <Route element={<RequireAuth allowedRoles={[Role.Admin]} />}>
@@ -67,7 +74,7 @@ const AppRoutes: React.FC = () => {
           <Route path="/models/:id/edit" element={<ModelEditPage />} />
           <Route path="/manufacturers/create" element={<ManufacturerCreatePage />} />
           <Route path="/manufacturers/:id/edit" element={<ManufacturerEditPage />} />
-          <Route path="/assets/:id/edit" element={<AssetEditPage />} />
+
         </Route>
 
         <Route path="*" element={<Navigate to="/me" replace />} />

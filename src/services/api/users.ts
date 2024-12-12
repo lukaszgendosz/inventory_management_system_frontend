@@ -7,21 +7,21 @@ import { SortOrder } from '../../utils/constraints';
 
 
 interface userQueryParams {
-  page: number | undefined;
-  page_size: number | undefined;
-  search: string | undefined;
-  order_by: string | undefined;
-  sort_order: SortOrder | undefined;
-  company_id: Array<string> | null;
-  location_id: Array<string> | null;
-  is_active: Array<string> | null;
-  role: Array<string> | null;
+  page?: number;
+  page_size?: number;
+  search?: string;
+  order_by?: string;
+  sort_order?: SortOrder;
+  company_id?: Array<string> | null;
+  location_id?: Array<string> | null;
+  is_active?: Array<string> | null;
+  role?: Array<string> | null;
 }
 
 const useUserService = () => {
   const axiosPrivate = useAxiosPrivate();
   
-  const getUsers = async (queryParams: userQueryParams) :Promise<AxiosResponse<UsersResponseScheme, any>> => {
+  const getUsers = async (queryParams: Partial<userQueryParams> = {}) :Promise<AxiosResponse<UsersResponseScheme, any>> => {
     try {
       const response  = await axiosPrivate<UsersResponseScheme>({
         url: "/api/v1/users",
@@ -30,15 +30,15 @@ const useUserService = () => {
           "Content-Type": ContentType.Json,
         },
         params: {
-          page: queryParams.page,
-          page_size: queryParams.page_size,
-          search: queryParams.search,
-          order_by: queryParams.order_by,
-          sort_order: queryParams.sort_order,
-          is_active: queryParams.is_active,
-          company_id: queryParams.company_id,
-          location_id: queryParams.location_id,
-          role: queryParams.role
+          page: queryParams.page ?? null,
+          page_size: queryParams.page_size ?? null,
+          search: queryParams.search ?? null,
+          order_by: queryParams.order_by ?? null,
+          sort_order: queryParams.sort_order ?? null,
+          is_active: queryParams.is_active ?? null,
+          company_id: queryParams.company_id ?? null,
+          location_id: queryParams.location_id ?? null,
+          role: queryParams.role ?? null
         },
       }); 
 

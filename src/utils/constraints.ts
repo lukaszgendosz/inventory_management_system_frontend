@@ -11,3 +11,11 @@ export interface baseQueryParams {
     order_by: string | undefined;
     sort_order: SortOrder | undefined;
   }
+
+export enum EventType {
+    CHECKOUT = "checkout",
+    CHECKIN = "checkin",
+    UPDATE = "update",
+    DELETE = "delete",
+    CREATE = "create",
+  }

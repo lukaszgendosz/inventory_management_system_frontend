@@ -106,7 +106,7 @@ const UserCreatePage: React.FC = () => {
       align="top"
     >
       <Card
-        title={'Edit user'}
+        title={'Create user'}
         style={{
           width: 'calc(100%)',
           height: 'calc(100%)',

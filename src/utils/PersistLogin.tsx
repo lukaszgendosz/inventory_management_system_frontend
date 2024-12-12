@@ -1,12 +1,11 @@
 import { Outlet } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import useRefreshToken from "../hooks/useRefreshToken";
 import { useAuth } from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import useUserService from "../services/api/users";
 
 const PersistLogin = () => {
-    const [isLoading, setIsLoading] = useState(true);
     const refresh = useRefreshToken();
     const { auth, setAuth } = useAuth();
     const navigate = useNavigate();
@@ -20,7 +19,9 @@ const PersistLogin = () => {
                         const current_user = res.data
                         setAuth(prev => {
                             return { ...prev,
-                                current_user: current_user}
+                                current_user: current_user,
+                                is_loaded: true
+                            }
                         });
                     });
                 });
@@ -28,20 +29,15 @@ const PersistLogin = () => {
             } catch (err) {
                 localStorage.removeItem('refresh_token');
                 navigate('/login');
-                console.log(err);
-            } finally {
-                setIsLoading(false);
             }
         }
 
-        !auth?.access_token ? verifyRefreshToken() : setIsLoading(false);
+        !auth?.access_token && verifyRefreshToken();
     }, []);
 
     return (
         <>
-            {isLoading 
-            ? <p>Loading...</p>
-            : <Outlet />}
+        <Outlet />
         </> 
     )
 }

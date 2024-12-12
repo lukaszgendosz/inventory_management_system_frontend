@@ -1,6 +1,7 @@
-import { useLocation, Navigate, Outlet } from "react-router-dom";
+import { useLocation, Navigate, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { Role } from "../models/user";
+import { Spin } from "antd";
 
 interface RequireAuthProps {
     allowedRoles: Role[];
@@ -9,15 +10,24 @@ interface RequireAuthProps {
 const RequireAuth = ({ allowedRoles }: RequireAuthProps) => {
     const { auth } = useAuth();
     const location = useLocation();
+    const navigate = useNavigate();
 
-    return (
-        allowedRoles?.includes(auth?.current_user?.role as Role)
-            ? <Outlet />
-            : auth?.access_token
-                ? <Navigate to="/unauthorized" state={{ from: location }} replace />
-                : <Navigate to="/login" state={{ from: location }} replace />
-    );
+    if (!auth?.is_loaded) {
+        return <Spin />;
+    }
 
+    if (!auth?.current_user?.role) {
+        sessionStorage.setItem('lastAttemptedPath', location.pathname);
+        navigate('/login');
+        return null;
+    }
+
+    if (!allowedRoles?.includes(auth?.current_user?.role as Role)) {
+        navigate(-1);
+        return null;
+    }
+
+    return <Outlet />;
 };
 
 export default RequireAuth;

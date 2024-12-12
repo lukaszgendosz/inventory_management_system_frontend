@@ -4,6 +4,7 @@ import { UserResponseScheme } from "../models/user";
 interface AuthState {
     access_token?: string;
     current_user?: UserResponseScheme;
+    is_loaded?: boolean;
 }
 
 interface AuthContextType {
@@ -12,14 +13,12 @@ interface AuthContextType {
 }
 export const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 
-
-// Define the AuthProvider props type
 interface AuthProviderProps {
     children: ReactNode;
 }
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-    const [auth, setAuth] = useState<AuthState>({}); 
+    const [auth, setAuth] = useState<AuthState>({is_loaded: false}); 
 
     return (
         <AuthContext.Provider value={{ auth, setAuth }}>

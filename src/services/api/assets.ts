@@ -7,13 +7,18 @@ import { SortOrder } from '../../utils/constraints';
 
 
 interface assetQueryParams {
-  page: number | undefined;
-  page_size: number | undefined;
-  search: string | undefined;
-  order_by: string | undefined;
-  sort_order: SortOrder | undefined;
-  company_id: Array<string> | null;
-  location_id: Array<string> | null;
+  page?: number;
+  page_size?: number;
+  search?: string;
+  order_by?: string;
+  sort_order: SortOrder;
+  status?: string[] | null;
+  company_id?: string[] | null;
+  location_id?: string[] | null;
+  model_id?: string[] | null;
+  supplier_id?: string[] | null;
+  manufacturer_id?: string[] | null;
+  user_id?: string[] | null;
 }
 
 const useAssetService = () => {
@@ -33,8 +38,13 @@ const useAssetService = () => {
           search: queryParams.search,
           order_by: queryParams.order_by,
           sort_order: queryParams.sort_order,
-          company_id: queryParams.company_id,
-          location_id: queryParams.location_id,
+          ...(queryParams.status !== undefined && { status: queryParams.status }),
+          ...(queryParams.company_id !== undefined && { company_id: queryParams.company_id }),
+          ...(queryParams.location_id !== undefined && { location_id: queryParams.location_id }),
+          ...(queryParams.model_id !== undefined && { model_id: queryParams.model_id }),
+          ...(queryParams.supplier_id !== undefined && { supplier_id: queryParams.supplier_id }),
+          ...(queryParams.manufacturer_id !== undefined && { manufacturer_id: queryParams.manufacturer_id }),
+          ...(queryParams.user_id !== undefined && { user_id: queryParams.user_id }),
         },
       }); 
 
@@ -43,14 +53,13 @@ const useAssetService = () => {
       return err;
     } 
   }
-  const getCurrentAsset = async (access_token: string) :Promise<AxiosResponse<AssetResponseScheme, any>> => {
+  const getCurrentUserAssets = async () :Promise<AxiosResponse<AssetResponseScheme[], any>> => {
     try {
-      const response  = await axiosPrivate<AssetResponseScheme>({
+      const response  = await axiosPrivate<AssetResponseScheme[]>({
         url: `/api/v1/assets/me`,
         method: "GET",
         headers: {
           "Content-Type": ContentType.Json,
-          "Authorization": `Bearer ${access_token}`
         }
       }); 
 
@@ -150,6 +159,89 @@ const useAssetService = () => {
     } 
   }
 
+  const checkoutAsset = async (assetId: number, userId: number) :Promise<AxiosResponse<AssetResponseScheme, any>> => {
+    try {
+      const response  = await axiosPrivate<AssetResponseScheme>({
+        url: `/api/v1/assets/${assetId}/checkout`,
+        method: "PATCH",
+        headers: {
+          "Content-Type": ContentType.Json,
+        },
+        params: {
+          asset_id: assetId,
+          user_id: userId
+        }
+
+      }); 
+
+      return response;
+    } catch (err: any) {
+      return err;
+    } 
+  }
+  const checkinAsset = async (assetId: number) :Promise<AxiosResponse<AssetResponseScheme, any>> => {
+    try {
+      const response  = await axiosPrivate<AssetResponseScheme>({
+        url: `/api/v1/assets/${assetId}/checkin`,
+        method: "PATCH",
+        headers: {
+          "Content-Type": ContentType.Json,
+        }
+
+      }); 
+
+      return response;
+    } catch (err: any) {
+      return err;
+    } 
+  }
+
+  const exportAssets = async (exportFormat: ContentType, queryParams: assetQueryParams) :Promise<AxiosResponse<any, any>> => {
+    try {
+      const response = await axiosPrivate({
+        url: "/api/v1/assets/export",
+        method: "GET",
+        headers: {
+          "Content-Type": ContentType.Json,
+          "Accept": exportFormat,
+        },
+        params: {
+          page: queryParams.page,
+          page_size: queryParams.page_size,
+          search: queryParams.search,
+          order_by: queryParams.order_by,
+          sort_order: queryParams.sort_order,
+          ...(queryParams.company_id !== undefined && { company_id: queryParams.company_id }),
+          ...(queryParams.location_id !== undefined && { location_id: queryParams.location_id }),
+          ...(queryParams.model_id !== undefined && { model_id: queryParams.model_id }),
+          ...(queryParams.supplier_id !== undefined && { supplier_id: queryParams.supplier_id }),
+          ...(queryParams.manufacturer_id !== undefined && { manufacturer_id: queryParams.manufacturer_id }),
+          ...(queryParams.user_id !== undefined && { user_id: queryParams.user_id }),
+        },
+        responseType: 'blob',
+      }); 
+      return response;
+    } catch (err: any) {
+      return err;
+    } 
+  }
+
+  const getUserAssets = async (userId: number): Promise<AxiosResponse<AssetsResponseScheme, any>> => {
+    try {
+      const response = await axiosPrivate<AssetsResponseScheme>({
+        url: `/api/v1/users/${userId}/assets`,
+        method: "GET",
+        headers: {
+          "Content-Type": ContentType.Json,
+        }
+      }); 
+
+      return response;
+    } catch (err: any) {
+      return err;
+    } 
+  };
+
   return {
     getAssets,
     getAsset,
@@ -157,7 +249,11 @@ const useAssetService = () => {
     updateAsset,
     deactivateAsset,
     activateAsset,
-    getCurrentAsset
+    getCurrentUserAssets,
+    checkoutAsset,
+    checkinAsset,
+    exportAssets,
+    getUserAssets
   }
 
 };

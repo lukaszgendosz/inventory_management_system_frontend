@@ -27,8 +27,12 @@ const Login: React.FC = () => {
                 getCurrentUser(access_token).then(res => {
                     const current_user = res.data
                     setAuth({current_user: current_user});
+                    
+                    const lastPath = sessionStorage.getItem('lastAttemptedPath');
+                    sessionStorage.removeItem('lastAttemptedPath');
+                    
+                    navigate(lastPath || '/me');
                 });
-                navigate('/me');
             });
         } catch (error) {
             console.log(error)
@@ -57,10 +61,10 @@ const Login: React.FC = () => {
                 <Image
                     preview={false}
                     style={{
-                        maxWidth: 800,
+                        maxWidth: 600,
                         paddingBottom: '24px'
                     }}
-                    src={'logo'}
+                    src={`logo-pwr.webp`}
                 />
                 <Form
                     name="signIn"

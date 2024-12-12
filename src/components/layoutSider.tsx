@@ -1,5 +1,5 @@
-import { EnvironmentOutlined, GoldOutlined, LaptopOutlined, TeamOutlined, TruckOutlined } from "@ant-design/icons";
-import { Menu, MenuProps } from "antd";
+import { DashboardOutlined, EnvironmentOutlined, GoldOutlined, LaptopOutlined, TeamOutlined, TruckOutlined } from "@ant-design/icons";
+import { Menu, MenuProps, Image } from "antd";
 import Sider from "antd/es/layout/Sider";
 import { AiOutlineProduct } from "react-icons/ai";
 import { BsBuilding } from "react-icons/bs";
@@ -7,6 +7,7 @@ import { MdOutlineFactory } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { Role } from "../models/user";
 import { useAuth } from "../hooks/useAuth";
+import { useState } from "react";
 
 interface LayoutSiderProps {
     collapsed: boolean
@@ -14,8 +15,10 @@ interface LayoutSiderProps {
 
 const LayoutSider: React.FC<LayoutSiderProps> = ( { collapsed }) => {
     const { auth } = useAuth(); 
+    const [selectedKey, setSelectedKey] = useState<string>('dashboard');
     const navigate = useNavigate();
     const navItems = [
+        { name: 'Dashboard', path: '/dashboard', icon: <DashboardOutlined style={{ fontSize: '1.2rem' }} />, roles: [ Role.Manager, Role.Admin] },
         { name: 'Assets', path: '/assets', icon: <LaptopOutlined style={{ fontSize: '1.2rem' }} />, roles: [ Role.Manager, Role.Admin] },
         { name: 'Users', path: '/users', icon: <TeamOutlined style={{ fontSize: '1.2rem' }} />, roles: [Role.Manager, Role.Admin] },
         { name: 'Locations', path: '/locations', icon: <EnvironmentOutlined style={{ fontSize: '1.2rem' }} />, roles: [Role.Manager, Role.Admin] },
@@ -41,15 +44,21 @@ const LayoutSider: React.FC<LayoutSiderProps> = ( { collapsed }) => {
 
     return (
         <Sider width={200} trigger={null} collapsible collapsed={collapsed} >
-          <div
-            className="demo-logo-vertical"
-            style={{ height: 36, margin: 14, backgroundColor: 'rgba(255, 255, 255, 0.3)', cursor: 'pointer' }}
-            onClick={() => navigate('/me')}
+          <Image
+            style={{ height: 36, width: 172, margin: 14, cursor: 'pointer' }}
+            preview={false}
+            src={`logo-pwr.webp`}
+            onClick={() => {
+              setSelectedKey('');
+              navigate('/me')
+            }}
           />
             <Menu
                 theme='dark'
                 mode="inline"
-                defaultSelectedKeys={['1']}
+                onSelect={(key) => setSelectedKey(key.key)}
+                defaultSelectedKeys={[selectedKey]}
+                selectedKeys={[selectedKey]}
                 style={{  borderRight: 0 }}
                 items={siderMenu}
             />

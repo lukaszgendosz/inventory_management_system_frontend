@@ -7,6 +7,7 @@ export enum ContentType {
     FormData = "multipart/form-data",
     UrlEncoded = "application/x-www-form-urlencoded",
     Text = "text/plain",
+    CSV = "text/csv",
   };
 
 export default axios.create({
